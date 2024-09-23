@@ -1,15 +1,17 @@
-
-
-// Declaración de terminales
+// Definición de terminales
 terminal Integer NUM;
-terminal PLUS;
+terminal PLUS, MINUS, TIMES, DIVIDE;
 
-// Declaración de no terminales
+// Definición de no terminales
 non terminal expr;
 
-// Definición del inicio del parser
-start with expr;
+// Definición de precedencias
+precedence left PLUS, MINUS;
+precedence left TIMES, DIVIDE;
 
-expr ::=
-    NUM:num1 PLUS NUM:num2 {: RESULT = num1 + num2; :}
-  ;
+// Producciones
+expr ::= expr PLUS expr
+      | expr MINUS expr
+      | expr TIMES expr
+      | expr DIVIDE expr
+      | NUM;

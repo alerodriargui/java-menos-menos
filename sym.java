@@ -9,12 +9,18 @@ public class sym {
   public static final int NUM = 2;
   public static final int error = 1;
   public static final int PLUS = 3;
+  public static final int MINUS = 4;
+  public static final int DIVIDE = 6;
+  public static final int TIMES = 5;
   public static final int EOF = 0;
   public static final String[] terminalNames = new String[] {
   "EOF",
   "error",
   "NUM",
-  "PLUS"
+  "PLUS",
+  "MINUS",
+  "TIMES",
+  "DIVIDE"
   };
 }
 

@@ -1,15 +1,17 @@
-%{
+
 import java_cup.runtime.Symbol;
-%}
+import java_cup.runtime.Scanner;
+
 
 %%
-%%
 
-// Definiciones de tokens
-[0-9]+      { return new Symbol(sym.NUM, Integer.parseInt(yytext())); }
-"+"        { return new Symbol(sym.PLUS); }
-"-"        { return new Symbol(sym.MINUS); }
-"*"        { return new Symbol(sym.TIMES); }
-"/"        { return new Symbol(sym.DIVIDE); }
-[ \t\n]    { /* Ignorar espacios en blanco */ }
-.          { System.err.println("Unrecognized character: " + yytext()); }
+
+
+%%
+[0-9]+    { return new Symbol(sym.NUM, new Integer(yytext())); }
+[ \t\n]   { /* ignorar espacios en blanco */ }
+"+"       { return new Symbol(sym.PLUS); }
+"-"       { return new Symbol(sym.MINUS); }
+"*"       { return new Symbol(sym.TIMES); }
+"/"       { return new Symbol(sym.DIVIDE); }
+.         { System.err.println("Carácter no reconocido: " + yytext()); }
