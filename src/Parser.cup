@@ -1,0 +1,15 @@
+
+
+// Declaración de terminales
+terminal Integer NUM;
+terminal PLUS;
+
+// Declaración de no terminales
+non terminal expr;
+
+// Definición del inicio del parser
+start with expr;
+
+expr ::=
+    NUM:num1 PLUS NUM:num2 {: RESULT = num1 + num2; :}
+  ;
