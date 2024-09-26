@@ -15,6 +15,8 @@ public class Main {
 	private HashMap<String, Object> hm = new HashMap<>();
 	private InstructionList instructionList;
 
+	private int variableRandom;
+
 	public Main(InstructionList instructionList)
 	{
 		this.instructionList = instructionList;
