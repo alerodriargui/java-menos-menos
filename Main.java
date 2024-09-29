@@ -29,8 +29,16 @@ public class Main {
 
 	static public void main(String argv[]) {
 		try {
-			parser p = new parser(new Lexer(new FileReader(argv[0])));
+
+			long tInicio = System.currentTimeMillis();
+			Lexer l = new Lexer(new FileReader(argv[0]));
+			long tFin = System.currentTimeMillis();
+			System.out.println("Tiempo de ejecución del lexer: " + (tFin - tInicio) + " milisegundos");
+
+			parser p = new parser(l);
 			Object result = p.parse().value;
+
+			((Main)result).exec();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
