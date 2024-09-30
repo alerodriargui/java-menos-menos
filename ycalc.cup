@@ -38,7 +38,7 @@ terminal           ASSIGN;
 terminal   	       EQ, LT, LE, GT, GE, NE; // num_rel
 terminal    	   STREQ, STRNOTEQ; //str_rel
 
-terminal           SEMI, COMMA, PLUS, MINUS, TIMES, DIVIDE, MODE, LPAREN, RPAREN;
+terminal           SEMI, COMMA, PLUS, MINUS, TIMES, DIVIDE, MODE, LPAREN, RPAREN, INCREMENT, DECREMENT;
 terminal Integer   NUM;
 terminal String    IDENT;
 terminal String    STRING;
@@ -65,7 +65,7 @@ non terminal Main program;
 
 /** Precedence */
 precedence left PLUS, MINUS;
-precedence left TIMES, DIVIDE, MODE; 
+precedence left TIMES, DIVIDE, MULTI, MODE; 
 
 precedence left OR, AND;
 precedence left NOT;
@@ -116,7 +116,9 @@ num_expr ::=  NUM:e
             | expr:e num_op:o expr:e2
                 {:
                     RESULT = new OperatorExpression(e, o, e2);
-                :}
+                :}               
+            | INCREMENT IDENT:i      {: RESULT = new PreIncrementExpression(i); :}
+            | DECREMENT IDENT:i      {: RESULT = new PreDecrementExpression(i); :}
             ;
 
 str_expr ::=  STRING:s

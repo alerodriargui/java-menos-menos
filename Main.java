@@ -168,6 +168,82 @@ class ModeOperator implements Operator {
 	}
 }
 
+class PreIncrementExpression implements Expr {
+    private String identifier;
+
+    public PreIncrementExpression(String identifier) {
+        this.identifier = identifier;
+    }
+
+    public Object run(HashMap<String, Object> hm) {
+        // Obtener el valor actual de la variable
+        int value = getValue(identifier, hm);
+        
+        // Incrementar el valor
+        value++;
+        
+        // Actualizar el valor en el HashMap
+        setValue(identifier, value, hm);
+        
+        // Devolver el nuevo valor
+        return value;
+    }
+
+    // Método para obtener el valor de una variable
+    private int getValue(String identifier, HashMap<String, Object> hm) {
+        if (hm.containsKey(identifier)) {
+            return (Integer) hm.get(identifier);
+        } else {
+            System.out.println("Error: variable " + identifier + " no está definida");
+            System.exit(1);
+            return 0; // No se debería llegar aquí
+        }
+    }
+
+    // Método para establecer el nuevo valor de una variable
+    private void setValue(String identifier, int value, HashMap<String, Object> hm) {
+        hm.put(identifier, value);
+    }
+}
+
+class PreDecrementExpression implements Expr {
+    private String identifier;
+
+    public PreDecrementExpression(String identifier) {
+        this.identifier = identifier;
+    }
+
+    public Object run(HashMap<String, Object> hm) {
+        // Obtener el valor actual de la variable
+        int value = getValue(identifier, hm);
+        
+        // Incrementar el valor
+        value--;
+        
+        // Actualizar el valor en el HashMap
+        setValue(identifier, value, hm);
+        
+        // Devolver el nuevo valor
+        return value;
+    }
+
+    // Método para obtener el valor de una variable
+    private int getValue(String identifier, HashMap<String, Object> hm) {
+        if (hm.containsKey(identifier)) {
+            return (Integer) hm.get(identifier);
+        } else {
+            System.out.println("Error: variable " + identifier + " no está definida");
+            System.exit(1);
+            return 0; // No se debería llegar aquí
+        }
+    }
+
+    // Método para establecer el nuevo valor de una variable
+    private void setValue(String identifier, int value, HashMap<String, Object> hm) {
+        hm.put(identifier, value);
+    }
+}
+
 class OperatorExpression implements Expr {
 
 	Expr e, e2;
