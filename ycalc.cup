@@ -65,7 +65,7 @@ non terminal Main program;
 
 /** Precedence */
 precedence left PLUS, MINUS;
-precedence left TIMES, DIVIDE, MULTI, MODE; 
+precedence left TIMES, DIVIDE, MODE; 
 
 precedence left OR, AND;
 precedence left NOT;
