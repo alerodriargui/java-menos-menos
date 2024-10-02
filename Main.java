@@ -15,7 +15,7 @@ public class Main {
 	private HashMap<String, Object> hm = new HashMap<>();
 	private InstructionList instructionList;
 
-	private int variableRandom;
+	private int variableRandom2;
 
 	public Main(InstructionList instructionList)
 	{
