@@ -12,5 +12,7 @@
   En el Main.java se escriben todas las clases y funciones necesarias que se utilizarán en el .cup
     
 * Para limpiar y quitar todos los programas generados por el compilador, ejecutar ``./clean.sh``
+
+* En caso de que recibamos le error de `bash: ./go.sh: Permission denied`, ejecutar `chmod 777 go.sh` para darle permisos
   
 
