@@ -4,7 +4,6 @@ import core.symbol_table.SymbolTable;
 import java_cup.runtime.ComplexSymbolFactory;
 import java_cup.runtime.ComplexSymbolFactory.ComplexSymbol;
 import java_cup.runtime.SymbolFactory;
-import java.util.ArrayList;
 
 
 
@@ -31,11 +30,11 @@ public class Main {
 	public void exec()
 	{
 		instructionList.run(hm);
-		for (String key : hm.keySet()) {
-			symbolTable.put(key, hm.get(key));
-		}
-		symbolTable.writeToFile("symbolTable.txt");
-		symbolTable.showSymbolTable();
+//		for (String key : hm.keySet()) {
+//			symbolTable.put(key, hm.get(key));
+//		}
+//		symbolTable.writeToFile("symbolTable.txt");
+//		symbolTable.showSymbolTable();
 	}
 
 	static public void main(String argv[]) {
@@ -49,20 +48,24 @@ public class Main {
 
 			parser p = new parser(l, sf);
 			Object result = p.parse().value;
+			p.getSymbolTable().writeToFile("symbolTable.txt");
+			saveTokensFile(l.tokens);
 
-			saveTokens(l.tokens);
-
-			((Main)result).exec();
+			if (result instanceof Main) {
+				((Main) result).exec();
+			} else {
+				System.err.println("Error: El parser no devolvió una instancia válida de Main.");
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
 	
-
-	private static void saveTokens(ArrayList<ComplexSymbol> tokens) {
+	// Método para guardar los tokens en un archivo
+	private static void saveTokensFile(ArrayList<ComplexSymbol> tokens) {
         try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter("Tokens.txt"));
+            BufferedWriter writer = new BufferedWriter(new FileWriter("TokensFitxer.txt"));
             for (int i = 0; i < tokens.size(); i++) {
                 writer.write(tokens.get(i).getName() + "\n");
             }
