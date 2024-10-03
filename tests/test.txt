@@ -13,7 +13,7 @@ begin
 	if (a < 5) then
 		a := 0 - a;
 	print (a);
-	d := TRUE;
+	d := supfalse;
 	print(d);
 	b := 10;
 	while (b > 1) do

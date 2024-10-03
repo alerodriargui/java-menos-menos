@@ -36,7 +36,7 @@ parser code {:
 
 /** Terminals */
 
-terminal           AND, OR, NOT, TRUE, FALSE; // boolean
+terminal           AND, OR, NOT, TRUE, FALSE, SUPTRUE, SUPFALSE; // boolean
 
 // flow
 terminal           BEGIN, END, EXIT; 
@@ -54,11 +54,14 @@ terminal String    IDENT;
 terminal String    STRING;
 
 
+
 /** Non-terminals **/
 non terminal Expr expr;
 non terminal Expr num_expr;
 non terminal Expr str_expr;
 non terminal Expr bool_expr;
+non terminal Expr bool_expr2;
+
 
 non terminal Operator num_op;
 non terminal Condition num_rel;
@@ -97,8 +100,12 @@ num_op ::= PLUS             {: RESULT = new PlusOperator(); :}
 expr ::= IDENT:i            {: RESULT = new ID(i); :}
             |num_expr:e     {: RESULT = e; :}
             |str_expr:e     {: RESULT = e; :}
+            |bool_expr2:e    {: RESULT = e; :}        
             ;
 
+bool_expr2 ::= SUPTRUE          {: RESULT = new BoolExpression2(true); :}
+            | SUPFALSE         {: RESULT = new BoolExpression2(false); :}
+            ;
 num_expr ::=  NUM:e
                 {:
                     RESULT = new IntExpression(e.intValue());

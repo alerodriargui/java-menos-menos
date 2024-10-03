@@ -20,7 +20,6 @@ public class Main {
 
 	private HashMap<String, Object> hm = new HashMap<>();
 	private InstructionList instructionList;
-    private SymbolTable symbolTable = new SymbolTable();
 
 	public Main(InstructionList instructionList)
 	{
@@ -30,11 +29,6 @@ public class Main {
 	public void exec()
 	{
 		instructionList.run(hm);
-//		for (String key : hm.keySet()) {
-//			symbolTable.put(key, hm.get(key));
-//		}
-//		symbolTable.writeToFile("symbolTable.txt");
-//		symbolTable.showSymbolTable();
 	}
 
 	static public void main(String argv[]) {
@@ -48,9 +42,13 @@ public class Main {
 
 			parser p = new parser(l, sf);
 			Object result = p.parse().value;
-			p.getSymbolTable().writeToFile("symbolTable.txt");
+			
+			// Guardar los tokens en un archivo
 			saveTokensFile(l.tokens);
 
+			// Guardar la tabla de símbolos en un archivo
+			saveSymbolTableFile(p.getSymbolTable());
+			
 			if (result instanceof Main) {
 				((Main) result).exec();
 			} else {
@@ -61,6 +59,10 @@ public class Main {
 		}
 	}
 
+	// Metodo para guardar la tabla de simbolos en un archivo
+	private static void saveSymbolTableFile(SymbolTable symbolTable) {
+		symbolTable.writeToFile("symbolTable.txt");
+	}
 	
 	// Método para guardar los tokens en un archivo
 	private static void saveTokensFile(ArrayList<ComplexSymbol> tokens) {
@@ -545,6 +547,29 @@ class StrNotEqCond implements Condition
 		}
 	}
 }
+
+
+class BoolExpression2 implements Expr {
+    private boolean value;
+
+    public BoolExpression2(boolean value) {
+        this.value = value;
+    }
+
+    public boolean getValue() {
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        return Boolean.toString(value);
+    }
+	public Object run(HashMap<String, Object> hm)
+	{
+		return value;
+	}
+}
+
 
 /** BOOLEAN OPERATIONS */
 class BooleanExpression implements Expr
