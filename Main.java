@@ -1,6 +1,12 @@
 import java.io.*;
 import java.util.*;
-import core.all.SymbolTable;
+import core.symbol_table.SymbolTable;
+import java_cup.runtime.ComplexSymbolFactory;
+import java_cup.runtime.ComplexSymbolFactory.ComplexSymbol;
+import java_cup.runtime.SymbolFactory;
+import java.util.ArrayList;
+
+
 
 interface Expr { Object run(HashMap<String, Object> hm); }
 interface Condition { boolean test(Expr e1, Expr e2, HashMap<String, Object> hm); }
@@ -38,15 +44,33 @@ public class Main {
 			Lexer l = new Lexer(new FileReader(argv[0]));
 			long tFin = System.currentTimeMillis();
 			System.out.println("Tiempo de ejecución del lexer: " + (tFin - tInicio) + " milisegundos");
+            
+			SymbolFactory sf = new ComplexSymbolFactory();
 
-			parser p = new parser(l);
+			parser p = new parser(l, sf);
 			Object result = p.parse().value;
+
+			saveTokens(l.tokens);
 
 			((Main)result).exec();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
+
+	
+
+	private static void saveTokens(ArrayList<ComplexSymbol> tokens) {
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter("Tokens.txt"));
+            for (int i = 0; i < tokens.size(); i++) {
+                writer.write(tokens.get(i).getName() + "\n");
+            }
+            writer.close();
+        } catch (IOException err) {
+            System.out.println(err);
+        }
+    }
 
 }
 

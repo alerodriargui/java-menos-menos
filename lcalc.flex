@@ -1,4 +1,7 @@
 import java_cup.runtime.*;
+import java_cup.runtime.ComplexSymbolFactory.ComplexSymbol;
+import java.util.ArrayList;
+
       
 %%
 
@@ -10,13 +13,31 @@ import java_cup.runtime.*;
 %cup
 
 %{  
-    private Symbol symbol(int type) {
-        return new Symbol(type, yyline, yycolumn);
+
+public ArrayList<ComplexSymbol> tokens = new ArrayList<>();
+
+    /*
+     * Create ComplexSymbol without attribute
+     */
+    private ComplexSymbol symbol(int type) {
+        ComplexSymbol cs = new ComplexSymbol(sym.terminalNames[type], type);
+        cs.left = yyline + 1;
+        cs.right = yycolumn;
+        tokens.add(cs);
+        return cs;
     }
-    
-    private Symbol symbol(int type, Object value) {
-        return new Symbol(type, yyline, yycolumn, value);
+
+    /*
+     * Create ComplexSymbol with attribute
+     */
+    private ComplexSymbol symbol(int type, Object value) {
+        ComplexSymbol cs = new ComplexSymbol(sym.terminalNames[type], type, value);
+        cs.left = yyline + 1;
+        cs.right = yycolumn;
+        tokens.add(cs);
+        return cs;
     }
+
 %}
    
 
