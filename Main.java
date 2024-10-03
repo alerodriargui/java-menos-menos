@@ -1,6 +1,7 @@
 import java.io.*;
 import java.util.*;
 import core.symbol_table.SymbolTable;
+import core.all.*;
 import java_cup.runtime.ComplexSymbolFactory;
 import java_cup.runtime.ComplexSymbolFactory.ComplexSymbol;
 import java_cup.runtime.SymbolFactory;
