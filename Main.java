@@ -549,21 +549,14 @@ class StrNotEqCond implements Condition
 }
 
 
-class BoolExpression2 implements Expr {
-    private boolean value;
+class BoolExpression2 implements Expr{
+	Boolean value;
 
-    public BoolExpression2(boolean value) {
-        this.value = value;
-    }
+	public BoolExpression2(Boolean e)
+	{
+		value = e;
+	}
 
-    public boolean getValue() {
-        return value;
-    }
-
-    @Override
-    public String toString() {
-        return Boolean.toString(value);
-    }
 	public Object run(HashMap<String, Object> hm)
 	{
 		return value;
