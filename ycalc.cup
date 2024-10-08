@@ -43,7 +43,7 @@ terminal           BEGIN, END, EXIT;
 terminal           IF, THEN, ELSE; 
 terminal           WHILE, DO; 
 
-terminal           PRINT, READINT, LENGTH, POSITION, READSTR, CONCATENATE, SUBSTRING;  // commands
+terminal           PRINT, READINT, LENGTH, POSITION, READSTR, CONCATENATE, SUBSTRING, FILEOUT;  // commands
 terminal           ASSIGN; 
 terminal   	       EQ, LT, LE, GT, GE, NE; // num_rel
 terminal    	   STREQ, STRNOTEQ; //str_rel
@@ -74,6 +74,7 @@ non terminal SimpleInstruction assign_stat;
 non terminal SimpleInstruction if_stat;
 non terminal SimpleInstruction while_stat;
 non terminal SimpleInstruction output_stat;
+non terminal SimpleInstruction fileoutput_stat;
 non terminal Main program;
 
 /** Precedence */
@@ -183,6 +184,7 @@ simple_instr ::= assign_stat:si                  {: RESULT = si; :}
               | while_stat:si                    {: RESULT = si; :}
               | BEGIN instr:si END               {: RESULT = new BeginEndInstruction(si); :}
               | output_stat:si                   {: RESULT = si; :}
+              | fileoutput_stat:si               {: RESULT = si; :}
               | EXIT                             {: System.exit(0); :}
               ;
 
@@ -220,7 +222,10 @@ while_stat ::= WHILE bool_expr:c DO simple_instr:s       {: RESULT = new WhileIn
             | DO simple_instr:s WHILE bool_expr:c        {: RESULT = new DoWhileInstruction(c, s); :}
             ;
 
-output_stat ::= PRINT LPAREN expr:e  RPAREN               {: RESULT = new OutputInstruction(e); :}
+output_stat ::= PRINT LPAREN expr:e RPAREN               {: RESULT = new OutputInstruction(e); :}
+            ;
+
+fileoutput_stat ::= FILEOUT LPAREN expr:s COMMA expr:s2 RPAREN    {: RESULT = new FileOutputInstruction(s, s2); :}
             ;
 
 program ::= instr:i

@@ -76,6 +76,7 @@ STRING = \"([^\\\"]|\\.)*\"
     "position"        { return symbol(sym.POSITION); }
     "readstr"         { return symbol(sym.READSTR); }
     "concatenate"     { return symbol(sym.CONCATENATE); }
+    "fileout"         { return symbol(sym.FILEOUT); }
     "substring"       { return symbol(sym.SUBSTRING); }
 
     ":="              {return symbol(sym.ASSIGN); }

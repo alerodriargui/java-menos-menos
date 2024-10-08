@@ -1,5 +1,6 @@
 import java.io.*;
 import java.util.*;
+import java.nio.charset.StandardCharsets;
 //import core.symbol_table.SymbolTable;
 import java_cup.runtime.ComplexSymbolFactory;
 import java_cup.runtime.ComplexSymbolFactory.ComplexSymbol;
@@ -776,6 +777,42 @@ class OutputInstruction implements SimpleInstruction
 	{
 		System.out.println(expr.run(hm));
 	}
+}
+
+class FileOutputInstruction implements SimpleInstruction
+{
+	Expr file, content;
+
+	public FileOutputInstruction(Expr s, Expr s2)
+	{
+		this.file = s;
+		this.content = s2;
+	}
+
+	public void run(HashMap<String, Object> hm)
+	{
+		Object fileoutput = file.run(hm);
+		Object contentoutput = content.run(hm);
+
+		if (fileoutput instanceof String && contentoutput instanceof String) {
+            int unused = writeToFile((String)fileoutput, (String)contentoutput);
+        } else {
+            System.out.println("Error: wrong objects type");
+            System.exit(1);
+        }
+	}
+
+	private int writeToFile(String fileName, String content) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, true))) {
+            writer.write(content);
+            writer.newLine();
+            return content.getBytes(StandardCharsets.UTF_8).length + System.lineSeparator().getBytes(StandardCharsets.UTF_8).length;
+        } catch (IOException e) {
+            System.err.println("Error writing to file: " + e.getMessage());
+			System.exit(1);
+			return -1;
+        }
+    }
 }
 
 
