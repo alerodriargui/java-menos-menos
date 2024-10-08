@@ -1,5 +1,11 @@
 import java.io.*;
 import java.util.*;
+import core.symbol_table.SymbolTable;
+import java_cup.runtime.ComplexSymbolFactory;
+import java_cup.runtime.ComplexSymbolFactory.ComplexSymbol;
+import java_cup.runtime.SymbolFactory;
+
+
 
 interface Expr { Object run(HashMap<String, Object> hm); }
 interface Condition { boolean test(Expr e1, Expr e2, HashMap<String, Object> hm); }
@@ -15,8 +21,6 @@ public class Main {
 	private HashMap<String, Object> hm = new HashMap<>();
 	private InstructionList instructionList;
 
-	private int variableRandom;
-
 	public Main(InstructionList instructionList)
 	{
 		this.instructionList = instructionList;
@@ -29,14 +33,52 @@ public class Main {
 
 	static public void main(String argv[]) {
 		try {
-			parser p = new parser(new Lexer(new FileReader(argv[0])));
+			long tInicio = System.currentTimeMillis();
+			Lexer l = new Lexer(new FileReader(argv[0]));
+			long tFin = System.currentTimeMillis();
+			System.out.println("Tiempo de ejecución del lexer: " + (tFin - tInicio) + " milisegundos");
+            
+			SymbolFactory sf = new ComplexSymbolFactory();
+
+			parser p = new parser(l, sf);
 			Object result = p.parse().value;
+			
+			// Guardar los tokens en un archivo
+			saveTokensFile(l.tokens);
+
+			// Guardar la tabla de símbolos en un archivo
+			saveSymbolTableFile(p.getSymbolTable());
+			
+			if (result instanceof Main) {
+				((Main) result).exec();
+			} else {
+				System.err.println("Error: El parser no devolvió una instancia válida de Main.");
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
+	// Metodo para guardar la tabla de simbolos en un archivo
+	private static void saveSymbolTableFile(SymbolTable symbolTable) {
+		symbolTable.writeToFile("symbolTable.txt");
+	}
+	
+	// Método para guardar los tokens en un archivo
+	private static void saveTokensFile(ArrayList<ComplexSymbol> tokens) {
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter("TokensFitxer.txt"));
+            for (int i = 0; i < tokens.size(); i++) {
+                writer.write(tokens.get(i).getName() + "\n");
+            }
+            writer.close();
+        } catch (IOException err) {
+            System.out.println(err);
+        }
+    }
+
 }
+
 
 /** VARS */
 class ID implements Expr
@@ -158,6 +200,82 @@ class ModeOperator implements Operator {
 			return 0;
 		}
 	}
+}
+
+class PreIncrementExpression implements Expr {
+    private String identifier;
+
+    public PreIncrementExpression(String identifier) {
+        this.identifier = identifier;
+    }
+
+    public Object run(HashMap<String, Object> hm) {
+        // Obtener el valor actual de la variable
+        int value = getValue(identifier, hm);
+        
+        // Incrementar el valor
+        value++;
+        
+        // Actualizar el valor en el HashMap
+        setValue(identifier, value, hm);
+        
+        // Devolver el nuevo valor
+        return value;
+    }
+
+    // Método para obtener el valor de una variable
+    private int getValue(String identifier, HashMap<String, Object> hm) {
+        if (hm.containsKey(identifier)) {
+            return (Integer) hm.get(identifier);
+        } else {
+            System.out.println("Error: variable " + identifier + " no está definida");
+            System.exit(1);
+            return 0; // No se debería llegar aquí
+        }
+    }
+
+    // Método para establecer el nuevo valor de una variable
+    private void setValue(String identifier, int value, HashMap<String, Object> hm) {
+        hm.put(identifier, value);
+    }
+}
+
+class PreDecrementExpression implements Expr {
+    private String identifier;
+
+    public PreDecrementExpression(String identifier) {
+        this.identifier = identifier;
+    }
+
+    public Object run(HashMap<String, Object> hm) {
+        // Obtener el valor actual de la variable
+        int value = getValue(identifier, hm);
+        
+        // Incrementar el valor
+        value--;
+        
+        // Actualizar el valor en el HashMap
+        setValue(identifier, value, hm);
+        
+        // Devolver el nuevo valor
+        return value;
+    }
+
+    // Método para obtener el valor de una variable
+    private int getValue(String identifier, HashMap<String, Object> hm) {
+        if (hm.containsKey(identifier)) {
+            return (Integer) hm.get(identifier);
+        } else {
+            System.out.println("Error: variable " + identifier + " no está definida");
+            System.exit(1);
+            return 0; // No se debería llegar aquí
+        }
+    }
+
+    // Método para establecer el nuevo valor de una variable
+    private void setValue(String identifier, int value, HashMap<String, Object> hm) {
+        hm.put(identifier, value);
+    }
 }
 
 class OperatorExpression implements Expr {
@@ -429,6 +547,22 @@ class StrNotEqCond implements Condition
 		}
 	}
 }
+
+
+class BoolExpression2 implements Expr{
+	Boolean value;
+
+	public BoolExpression2(Boolean e)
+	{
+		value = e;
+	}
+
+	public Object run(HashMap<String, Object> hm)
+	{
+		return value;
+	}
+}
+
 
 /** BOOLEAN OPERATIONS */
 class BooleanExpression implements Expr
