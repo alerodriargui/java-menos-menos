@@ -20,6 +20,7 @@ public class Main {
 
 	private HashMap<String, Object> hm = new HashMap<>();
 	private InstructionList instructionList;
+    private SymbolTable symbolTable = new SymbolTable();
 
 	public Main(InstructionList instructionList)
 	{
@@ -29,10 +30,21 @@ public class Main {
 	public void exec()
 	{
 		instructionList.run(hm);
+		for (String key : hm.keySet()) {
+			symbolTable.put(key, hm.get(key));
+		}
+		symbolTable.writeToFile("symbolTable.txt");
+		symbolTable.showSymbolTable();
 	}
 
 	static public void main(String argv[]) {
 		try {
+			long tInicio = System.currentTimeMillis();
+			Lexer l = new Lexer(new FileReader(argv[0]));
+			long tFin = System.currentTimeMillis();
+			System.out.println("Tiempo de ejecución del lexer: " + (tFin - tInicio) + " milisegundos");
+
+			parser p = new parser(l);
 			long tInicio = System.currentTimeMillis();
 			Lexer l = new Lexer(new FileReader(argv[0]));
 			long tFin = System.currentTimeMillis();
@@ -59,26 +71,37 @@ public class Main {
 		}
 	}
 
-	// Metodo para guardar la tabla de simbolos en un archivo
-	private static void saveSymbolTableFile(SymbolTable symbolTable) {
-		symbolTable.writeToFile("symbolTable.txt");
-	}
-	
-	// Método para guardar los tokens en un archivo
-	private static void saveTokensFile(ArrayList<ComplexSymbol> tokens) {
-        try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter("TokensFitxer.txt"));
-            for (int i = 0; i < tokens.size(); i++) {
-                writer.write(tokens.get(i).getName() + "\n");
+}
+
+class SymbolTable {
+    private HashMap<String, Object> symbols = new HashMap<>();
+
+    public void put(String name, Object value) {
+        symbols.put(name, value);
+    }
+
+    public Object get(String name) {
+        return symbols.get(name);
+    }
+
+    public void showSymbolTable() {
+        System.out.println("Tabla de símbolos:");
+        for (String key : symbols.keySet()) {
+            System.out.println(key + ": " + symbols.get(key));
+        }
+    }
+	public void writeToFile(String fileName) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
+            for (String key : symbols.keySet()) {
+                writer.write(key + ": " + symbols.get(key));
+                writer.newLine(); // Añade una nueva línea después de cada entrada
             }
-            writer.close();
-        } catch (IOException err) {
-            System.out.println(err);
+        } catch (IOException e) {
+            System.err.println("Error al escribir en el archivo: " + e.getMessage());
         }
     }
 
 }
-
 
 /** VARS */
 class ID implements Expr
