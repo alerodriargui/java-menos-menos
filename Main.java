@@ -1,6 +1,6 @@
 import java.io.*;
 import java.util.*;
-import core.symbol_table.SymbolTable;
+//import core.symbol_table.SymbolTable;
 import java_cup.runtime.ComplexSymbolFactory;
 import java_cup.runtime.ComplexSymbolFactory.ComplexSymbol;
 import java_cup.runtime.SymbolFactory;
@@ -43,12 +43,6 @@ public class Main {
 			Lexer l = new Lexer(new FileReader(argv[0]));
 			long tFin = System.currentTimeMillis();
 			System.out.println("Tiempo de ejecución del lexer: " + (tFin - tInicio) + " milisegundos");
-
-			parser p = new parser(l);
-			long tInicio = System.currentTimeMillis();
-			Lexer l = new Lexer(new FileReader(argv[0]));
-			long tFin = System.currentTimeMillis();
-			System.out.println("Tiempo de ejecución del lexer: " + (tFin - tInicio) + " milisegundos");
             
 			SymbolFactory sf = new ComplexSymbolFactory();
 
@@ -56,10 +50,10 @@ public class Main {
 			Object result = p.parse().value;
 			
 			// Guardar los tokens en un archivo
-			saveTokensFile(l.tokens);
+			//saveTokensFile(l.tokens);
 
 			// Guardar la tabla de símbolos en un archivo
-			saveSymbolTableFile(p.getSymbolTable());
+			//saveSymbolTableFile(p.getSymbolTable());
 			
 			if (result instanceof Main) {
 				((Main) result).exec();
