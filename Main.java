@@ -49,12 +49,6 @@ public class Main {
 			parser p = new parser(l, sf);
 			Object result = p.parse().value;
 			
-			// Guardar los tokens en un archivo
-			//saveTokensFile(l.tokens);
-
-			// Guardar la tabla de símbolos en un archivo
-			//saveSymbolTableFile(p.getSymbolTable());
-			
 			if (result instanceof Main) {
 				((Main) result).exec();
 			} else {
