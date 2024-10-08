@@ -1,9 +1,19 @@
 import java_cup.runtime.*;
 import java.util.*;
 import java.io.*;
+import core.symbol_table.SymbolTable;
+import core.symbol_table.SymbolType;
+import core.symbol_table.Symbol;
 
 parser code {:
-   
+
+
+    private SymbolTable symbolTable = new SymbolTable();
+
+    public SymbolTable getSymbolTable() {
+        return symbolTable;
+    }
+
     public void report_error(String message, Object info) {
         StringBuilder m = new StringBuilder("Error");
         if (info instanceof java_cup.runtime.Symbol) {
@@ -26,7 +36,7 @@ parser code {:
 
 /** Terminals */
 
-terminal           AND, OR, NOT, TRUE, FALSE; // boolean
+terminal           AND, OR, NOT, TRUE, FALSE, SUPTRUE, SUPFALSE; // boolean
 
 // flow
 terminal           BEGIN, END, EXIT; 
@@ -44,11 +54,14 @@ terminal String    IDENT;
 terminal String    STRING;
 
 
+
 /** Non-terminals **/
 non terminal Expr expr;
 non terminal Expr num_expr;
 non terminal Expr str_expr;
 non terminal Expr bool_expr;
+non terminal Expr bool_expr2;
+
 
 non terminal Operator num_op;
 non terminal Condition num_rel;
@@ -87,8 +100,12 @@ num_op ::= PLUS             {: RESULT = new PlusOperator(); :}
 expr ::= IDENT:i            {: RESULT = new ID(i); :}
             |num_expr:e     {: RESULT = e; :}
             |str_expr:e     {: RESULT = e; :}
+            |bool_expr2:e    {: RESULT = e; :}        
             ;
 
+bool_expr2 ::= SUPTRUE          {: RESULT = new BoolExpression2(true); :}
+            | SUPFALSE         {: RESULT = new BoolExpression2(false); :}
+            ;
 num_expr ::=  NUM:e
                 {:
                     RESULT = new IntExpression(e.intValue());
@@ -173,7 +190,26 @@ instr ::= instr:i SEMI simple_instr:si           {: i.add(si); RESULT = i; :}
         | simple_instr:si                        {: RESULT = new InstructionList(si); :}
         ;
 
-assign_stat ::= IDENT:i ASSIGN expr:e          {: RESULT = new AssignInstruction(i,e); :}
+assign_stat ::= IDENT:i ASSIGN expr:e          {: 
+        // Aquí obtenemos el tipo del símbolo basado en la expresión
+        SymbolType type;
+        if (e instanceof IntExpression) {
+            type = SymbolType.INTEGER;
+        } else if (e instanceof StringExpression) {
+            type = SymbolType.STRING;
+        } else if (e instanceof BooleanExpression) {
+            type = SymbolType.BOOLEAN;
+        } else if (e instanceof OperatorExpression) {
+            type = SymbolType.INTEGER;
+        } else {
+            // Manejo para otros tipos si es necesario
+            type = SymbolType.OTHER; // Asignamos un tipo predeterminado en caso de funciones u otros
+        }
+        
+        // Añadir el símbolo a la tabla
+        symbolTable.put(i.toString(), e, type);
+
+RESULT = new AssignInstruction(i,e); :}
                 ;
 
 if_stat ::= IF bool_expr:c THEN simple_instr:s                          {: RESULT = new IfInstruction(c, s); :}
@@ -189,7 +225,6 @@ output_stat ::= PRINT LPAREN expr:e  RPAREN               {: RESULT = new Output
 
 program ::= instr:i
           {:
-            Main program = new Main(i);
-            program.exec();
+            RESULT = new Main(i);  // Devuelve una instancia de Main
           :}
           ;

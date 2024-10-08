@@ -1,5 +1,11 @@
 import java.io.*;
 import java.util.*;
+import core.symbol_table.SymbolTable;
+import java_cup.runtime.ComplexSymbolFactory;
+import java_cup.runtime.ComplexSymbolFactory.ComplexSymbol;
+import java_cup.runtime.SymbolFactory;
+
+
 
 interface Expr { Object run(HashMap<String, Object> hm); }
 interface Condition { boolean test(Expr e1, Expr e2, HashMap<String, Object> hm); }
@@ -39,9 +45,27 @@ public class Main {
 			System.out.println("Tiempo de ejecución del lexer: " + (tFin - tInicio) + " milisegundos");
 
 			parser p = new parser(l);
-			Object result = p.parse().value;
+			long tInicio = System.currentTimeMillis();
+			Lexer l = new Lexer(new FileReader(argv[0]));
+			long tFin = System.currentTimeMillis();
+			System.out.println("Tiempo de ejecución del lexer: " + (tFin - tInicio) + " milisegundos");
+            
+			SymbolFactory sf = new ComplexSymbolFactory();
 
-			((Main)result).exec();
+			parser p = new parser(l, sf);
+			Object result = p.parse().value;
+			
+			// Guardar los tokens en un archivo
+			saveTokensFile(l.tokens);
+
+			// Guardar la tabla de símbolos en un archivo
+			saveSymbolTableFile(p.getSymbolTable());
+			
+			if (result instanceof Main) {
+				((Main) result).exec();
+			} else {
+				System.err.println("Error: El parser no devolvió una instancia válida de Main.");
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -546,6 +570,22 @@ class StrNotEqCond implements Condition
 		}
 	}
 }
+
+
+class BoolExpression2 implements Expr{
+	Boolean value;
+
+	public BoolExpression2(Boolean e)
+	{
+		value = e;
+	}
+
+	public Object run(HashMap<String, Object> hm)
+	{
+		return value;
+	}
+}
+
 
 /** BOOLEAN OPERATIONS */
 class BooleanExpression implements Expr
