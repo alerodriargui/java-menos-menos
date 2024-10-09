@@ -207,10 +207,12 @@ assign_stat ::= IDENT:i ASSIGN expr:e          {:
             type = SymbolType.INTEGER;
         } else if (e instanceof StringExpression) {
             type = SymbolType.STRING;
-        } else if (e instanceof BooleanExpression) {
+        } else if (e instanceof BoolExpression2) {
             type = SymbolType.BOOLEAN;
         } else if (e instanceof OperatorExpression) {
             type = SymbolType.INTEGER;
+        } else if (e instanceof TupleExpression) {
+            type = SymbolType.TUPLE;
         } else {
             // Manejo para otros tipos si es necesario
             type = SymbolType.OTHER; // Asignamos un tipo predeterminado en caso de funciones u otros

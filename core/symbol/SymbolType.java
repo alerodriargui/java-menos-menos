@@ -5,5 +5,6 @@ public enum SymbolType {
     STRING,
     BOOLEAN,
     FUNCTION,
+    TUPLE,
     OTHER
 }
