@@ -1,4 +1,4 @@
-package core.symbol_table;
+package core.symbol;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;

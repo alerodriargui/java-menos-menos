@@ -1,4 +1,4 @@
-package core.symbol_table;
+package core.symbol;
 
 public class Symbol {
     private String name;

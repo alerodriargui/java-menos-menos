@@ -1,10 +1,12 @@
 import java.io.*;
 import java.util.*;
+import core.symbol.SymbolTable;
+import core.all.Tuple;
 import java.nio.charset.StandardCharsets;
-//import core.symbol_table.SymbolTable;
 import java_cup.runtime.ComplexSymbolFactory;
 import java_cup.runtime.ComplexSymbolFactory.ComplexSymbol;
 import java_cup.runtime.SymbolFactory;
+import java.util.Arrays;
 
 
 
@@ -21,7 +23,6 @@ public class Main {
 
 	private HashMap<String, Object> hm = new HashMap<>();
 	private InstructionList instructionList;
-    private SymbolTable symbolTable = new SymbolTable();
 
 	public Main(InstructionList instructionList)
 	{
@@ -31,11 +32,6 @@ public class Main {
 	public void exec()
 	{
 		instructionList.run(hm);
-		for (String key : hm.keySet()) {
-			symbolTable.put(key, hm.get(key));
-		}
-		symbolTable.writeToFile("symbolTable.txt");
-		symbolTable.showSymbolTable();
 	}
 
 	static public void main(String argv[]) {
@@ -50,6 +46,12 @@ public class Main {
 			parser p = new parser(l, sf);
 			Object result = p.parse().value;
 			
+			// Guardar los tokens en un archivo
+			saveTokensFile(l.tokens);
+
+			// Guardar la tabla de símbolos en un archivo
+			saveSymbolTableFile(p.getSymbolTable());
+			
 			if (result instanceof Main) {
 				((Main) result).exec();
 			} else {
@@ -60,37 +62,82 @@ public class Main {
 		}
 	}
 
-}
-
-class SymbolTable {
-    private HashMap<String, Object> symbols = new HashMap<>();
-
-    public void put(String name, Object value) {
-        symbols.put(name, value);
-    }
-
-    public Object get(String name) {
-        return symbols.get(name);
-    }
-
-    public void showSymbolTable() {
-        System.out.println("Tabla de símbolos:");
-        for (String key : symbols.keySet()) {
-            System.out.println(key + ": " + symbols.get(key));
-        }
-    }
-	public void writeToFile(String fileName) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
-            for (String key : symbols.keySet()) {
-                writer.write(key + ": " + symbols.get(key));
-                writer.newLine(); // Añade una nueva línea después de cada entrada
+	// Metodo para guardar la tabla de simbolos en un archivo
+	@SuppressWarnings("unused")
+	private static void saveSymbolTableFile(SymbolTable symbolTable) {
+		symbolTable.writeToFile("symbolTable.txt");
+	}
+	
+	// Método para guardar los tokens en un archivo
+	private static void saveTokensFile(ArrayList<ComplexSymbol> tokens) {
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter("TokensFitxer.txt"));
+            for (int i = 0; i < tokens.size(); i++) {
+                writer.write(tokens.get(i).getName() + "\n");
             }
-        } catch (IOException e) {
-            System.err.println("Error al escribir en el archivo: " + e.getMessage());
+            writer.close();
+        } catch (IOException err) {
+            System.out.println(err);
         }
     }
 
 }
+
+class FileOutputInstruction implements SimpleInstruction
+{
+	Expr file, content;
+
+	public FileOutputInstruction(Expr s, Expr s2)
+	{
+		this.file = s;
+		this.content = s2;
+	}
+
+	public void run(HashMap<String, Object> hm)
+	{
+		Object fileoutput = file.run(hm);
+		Object contentoutput = content.run(hm);
+
+		if (fileoutput instanceof String && contentoutput instanceof String) {
+            int unused = writeToFile((String)fileoutput, (String)contentoutput);
+        } else {
+            System.out.println("Error: wrong objects type");
+            System.exit(1);
+        }
+	}
+
+	private int writeToFile(String fileName, String content) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, true))) {
+            writer.write(content);
+            writer.newLine();
+            return content.getBytes(StandardCharsets.UTF_8).length + System.lineSeparator().getBytes(StandardCharsets.UTF_8).length;
+        } catch (IOException e) {
+            System.err.println("Error writing to file: " + e.getMessage());
+			System.exit(1);
+			return -1;
+        }
+    }
+}
+
+
+
+
+class TupleExpression implements Expr {
+    Expr e1, e2;
+
+    public TupleExpression(Expr e1, Expr e2) {
+        this.e1 = e1;
+        this.e2 = e2;
+    }
+
+    public Object run(HashMap<String, Object> hm) {
+        Object value1 = e1.run(hm);
+        Object value2 = e2.run(hm);
+        
+        return new Tuple(Arrays.asList(value1, value2)); // Crea una lista de los valores
+    }
+}
+
 
 /** VARS */
 class ID implements Expr
@@ -430,13 +477,20 @@ class EqCond implements Condition
 		Object v1 = e1.run(hm);
 		Object v2 = e2.run(hm);
 
-		if (v1 instanceof Integer && v2 instanceof Integer) {
-			return (Integer)v1 == (Integer)v2;
-		} else {
-			System.out.println("Error: wrong objects type");
-			System.exit(1);
-			return false;
-		}
+        // Comparar enteros
+        if (v1 instanceof Integer && v2 instanceof Integer) {
+            return (Integer) v1 == (Integer) v2;
+        }
+        // Comparar booleanos
+        else if (v1 instanceof Boolean && v2 instanceof Boolean) {
+            return (Boolean) v1 == (Boolean) v2;
+        } 
+        // Manejo de error para tipos incorrectos
+        else {
+            System.out.println("Error: wrong objects type for equality comparison");
+            System.exit(1);
+            return false;
+        }
 
 	}
 }
@@ -779,42 +833,6 @@ class OutputInstruction implements SimpleInstruction
 	}
 }
 
-class FileOutputInstruction implements SimpleInstruction
-{
-	Expr file, content;
-
-	public FileOutputInstruction(Expr s, Expr s2)
-	{
-		this.file = s;
-		this.content = s2;
-	}
-
-	public void run(HashMap<String, Object> hm)
-	{
-		Object fileoutput = file.run(hm);
-		Object contentoutput = content.run(hm);
-
-		if (fileoutput instanceof String && contentoutput instanceof String) {
-            int unused = writeToFile((String)fileoutput, (String)contentoutput);
-        } else {
-            System.out.println("Error: wrong objects type");
-            System.exit(1);
-        }
-	}
-
-	private int writeToFile(String fileName, String content) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, true))) {
-            writer.write(content);
-            writer.newLine();
-            return content.getBytes(StandardCharsets.UTF_8).length + System.lineSeparator().getBytes(StandardCharsets.UTF_8).length;
-        } catch (IOException e) {
-            System.err.println("Error writing to file: " + e.getMessage());
-			System.exit(1);
-			return -1;
-        }
-    }
-}
-
 
 /** FLOW OPERATIONS */
 class InstructionList
@@ -834,6 +852,18 @@ class InstructionList
 		for (SimpleInstruction si: simpleInstructions) {
 			si.run(hm);
 		}
+	}
+}
+
+class ConstInstruction implements SimpleInstruction {
+	private Expr expr;
+
+	public ConstInstruction(Expr e) {
+		expr = e;
+	}
+
+	public void run(HashMap<String, Object> hm) {
+		expr.run(hm);
 	}
 }
 

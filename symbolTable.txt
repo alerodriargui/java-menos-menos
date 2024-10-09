@@ -1,7 +1,8 @@
-s3: asddsa
-a: -1
-b: 1
-c: 3
-d: null
-s1: asd
-s2: dsa
+s3 (OTHER): ConcatStringExpression@3f91beef
+a (INTEGER): OperatorExpression@1a6c5a9e
+b (INTEGER): OperatorExpression@37bba400
+c (OTHER): PreDecrementExpression@179d3b25
+d (OTHER): BoolExpression2@254989ff
+e (OTHER): TupleExpression@5d099f62
+s1 (STRING): StringExpression@37f8bb67
+s2 (STRING): StringExpression@49c2faae

@@ -1,9 +1,9 @@
 import java_cup.runtime.*;
 import java.util.*;
 import java.io.*;
-import core.symbol_table.SymbolTable;
-import core.symbol_table.SymbolType;
-import core.symbol_table.Symbol;
+import core.symbol.SymbolTable;
+import core.symbol.SymbolType;
+import core.symbol.Symbol;
 
 parser code {:
 
@@ -61,6 +61,7 @@ non terminal Expr num_expr;
 non terminal Expr str_expr;
 non terminal Expr bool_expr;
 non terminal Expr bool_expr2;
+non terminal Expr tuple_expr;
 
 
 non terminal Operator num_op;
@@ -101,7 +102,14 @@ num_op ::= PLUS             {: RESULT = new PlusOperator(); :}
 expr ::= IDENT:i            {: RESULT = new ID(i); :}
             |num_expr:e     {: RESULT = e; :}
             |str_expr:e     {: RESULT = e; :}
-            |bool_expr2:e    {: RESULT = e; :}        
+            |bool_expr2:e    {: RESULT = e; :} 
+            |tuple_expr:e          {: RESULT = e; :} 
+            ;
+
+tuple_expr ::= LPAREN expr:e COMMA expr:e2 RPAREN
+                {:
+                    RESULT = new TupleExpression(e, e2);
+                :}
             ;
 
 bool_expr2 ::= SUPTRUE          {: RESULT = new BoolExpression2(true); :}
@@ -215,7 +223,9 @@ RESULT = new AssignInstruction(i,e); :}
                 ;
 
 if_stat ::= IF bool_expr:c THEN simple_instr:s                          {: RESULT = new IfInstruction(c, s); :}
+            | IF bool_expr2:c THEN simple_instr:s                        {: RESULT = new IfInstruction(c, s); :}
             | IF bool_expr:c THEN simple_instr:s ELSE simple_instr:s2   {:  RESULT = new IfElseInstruction(c, s, s2); :}
+            | IF bool_expr2:c THEN simple_instr:s ELSE simple_instr:s2   {:  RESULT = new IfElseInstruction(c, s, s2); :}
             ;
 
 while_stat ::= WHILE bool_expr:c DO simple_instr:s       {: RESULT = new WhileInstruction(c, s); :}
