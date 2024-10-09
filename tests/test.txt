@@ -12,13 +12,9 @@ begin
 	e := (5, 10);
 	print(e);
 	d := suptrue;
-	if (d = suptrue) then
-		print(d);
-	
-	if (d = supfalse) then
-		print(d);	
-	if (a < 5) then
-		a := 0 - a;
+	if (d = suptrue) then print(d);
+	if (d = supfalse) then print(d) else print(e);	
+	if (a < 5) then a := 0 - a;
 	print (a);
 	b := 10;
 	while (b > 1) do
