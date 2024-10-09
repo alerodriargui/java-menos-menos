@@ -103,7 +103,7 @@ STRING = \"([^\\\"]|\\.)*\"
     "++"               { return symbol(sym.INCREMENT); }   
     "--"               { return symbol(sym.DECREMENT); }
     
-    {NUM}      { return symbol(sym.NUM, new Integer(yytext())); }
+    {NUM}      { return symbol(sym.NUM, Integer.parseInt(yytext())); }
     {IDENT}       { return symbol(sym.IDENT, new String(yytext()));}
     {STRING}      { return symbol(sym.STRING, new String(yytext())); }
 
