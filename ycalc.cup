@@ -143,8 +143,8 @@ num_expr ::=  NUM:e
                 {:
                     RESULT = new OperatorExpression(e, o, e2);
                 :}               
-            | INCREMENT IDENT:i      {: RESULT = new PreIncrementExpression(i); :}
-            | DECREMENT IDENT:i      {: RESULT = new PreDecrementExpression(i); :}
+            | INCREMENT expr:i      {: RESULT = new PreIncrementExpression(i); :}
+            | DECREMENT expr:i      {: RESULT = new PreDecrementExpression(i); :}
             ;
 
 str_expr ::=  STRING:s

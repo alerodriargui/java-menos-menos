@@ -132,33 +132,33 @@ A continuación, se presenta una lista de todas las características que debe te
         - [ ] Otros
     - [ ] Llamadas a procedimientos y funciones con parámetros.
     - [ ] Retorno de funciones (si se implementan).
-- [ ] Expresiones aritméticas y lógicas:
-    - [ ] Usando literales.
+- [x] Expresiones aritméticas y lógicas:
+    - [x] Usando literales.
     - [ ] Usando constantes y variables.
-- [ ] Operaciones de entrada/salida:
+- [x] Operaciones de entrada/salida:
     - [x] Entrada por teclado
     - [x] Salida por pantalla
-    - [ ] Entrada/salida desde archivo*
-- [ ] Operadores implementados:
-    - [ ] Aritméticos:
+    - [x] Entrada/salida desde archivo*
+- [x] Operadores implementados:
+    - [x] Aritméticos:
         - [x] Suma
         - [x] Resta
         - [x] Multiplicación
         - [x] División
         - [x] Módulo
-    - [ ] Relacionales:
+    - [x] Relacionales:
         - [x] Igual
         - [x] Diferente
         - [x] Mayor que
         - [x] Menor que
         - [ ] Mayor o igual
         - [ ] Menor o igual
-    - [ ] Lógicos:
-        - [ ] Y
-        - [ ] O
+    - [x] Lógicos:
+        - [x] Y
+        - [x] O
         - [x] No
         - [ ] O-excluyente
-    - [ ] Especiales:
+    - [x] Especiales:
         - [x] Pre incremento/decremento*
         - [x] Post incremento/decremento*
         - [ ] Asignación combinada con operación (+=, etc.)*
