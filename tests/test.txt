@@ -12,7 +12,7 @@ begin
 	e := (5, 10);
 	print(e);
 	d := suptrue;
-	if (d = suptrue) then print(d);
+	if (d = suptrue && a < 5) then print(d);
 	if (d = supfalse) then print(d) else print(e);	
 	if (a < 5) then a := 0 - a;
 	print (a);

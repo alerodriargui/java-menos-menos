@@ -53,8 +53,8 @@ STRING = \"([^\\\"]|\\.)*\"
 <YYINITIAL> {
 
     /** Keywords. */
-    "and"             { return symbol(sym.AND); }
-    "or"              { return symbol(sym.OR); }
+    "&&"             { return symbol(sym.AND); }
+    "||"              { return symbol(sym.OR); }
     "not"             { return symbol(sym.NOT); }
     "true"            { return symbol(sym.TRUE); }
     "false"           { return symbol(sym.FALSE); }
