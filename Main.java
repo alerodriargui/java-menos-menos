@@ -1,9 +1,11 @@
 import java.io.*;
 import java.util.*;
 import core.symbol_table.SymbolTable;
+import core.all.Tuple;
 import java_cup.runtime.ComplexSymbolFactory;
 import java_cup.runtime.ComplexSymbolFactory.ComplexSymbol;
 import java_cup.runtime.SymbolFactory;
+import java.util.Arrays;
 
 
 
@@ -77,6 +79,23 @@ public class Main {
         }
     }
 
+}
+
+
+class TupleExpression implements Expr {
+    Expr e1, e2;
+
+    public TupleExpression(Expr e1, Expr e2) {
+        this.e1 = e1;
+        this.e2 = e2;
+    }
+
+    public Object run(HashMap<String, Object> hm) {
+        Object value1 = e1.run(hm);
+        Object value2 = e2.run(hm);
+        
+        return new Tuple(Arrays.asList(value1, value2)); // Crea una lista de los valores
+    }
 }
 
 
@@ -418,13 +437,24 @@ class EqCond implements Condition
 		Object v1 = e1.run(hm);
 		Object v2 = e2.run(hm);
 
-		if (v1 instanceof Integer && v2 instanceof Integer) {
-			return (Integer)v1 == (Integer)v2;
-		} else {
-			System.out.println("Error: wrong objects type");
-			System.exit(1);
-			return false;
-		}
+        // Comparar enteros
+        if (v1 instanceof Integer && v2 instanceof Integer) {
+            return (Integer) v1 == (Integer) v2;
+        }
+        // Comparar booleanos
+        else if (v1 instanceof Boolean && v2 instanceof Boolean) {
+            return (Boolean) v1 == (Boolean) v2;
+        } 
+        // Comparar cadenas
+        else if (v1 instanceof String && v2 instanceof String) {
+            return v1.equals(v2);
+        }
+        // Manejo de error para tipos incorrectos
+        else {
+            System.out.println("Error: wrong objects type for equality comparison");
+            System.exit(1);
+            return false;
+        }
 
 	}
 }
@@ -786,6 +816,18 @@ class InstructionList
 		for (SimpleInstruction si: simpleInstructions) {
 			si.run(hm);
 		}
+	}
+}
+
+class ConstInstruction implements SimpleInstruction {
+	private Expr expr;
+
+	public ConstInstruction(Expr e) {
+		expr = e;
+	}
+
+	public void run(HashMap<String, Object> hm) {
+		expr.run(hm);
 	}
 }
 

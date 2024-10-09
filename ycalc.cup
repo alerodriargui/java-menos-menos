@@ -61,6 +61,7 @@ non terminal Expr num_expr;
 non terminal Expr str_expr;
 non terminal Expr bool_expr;
 non terminal Expr bool_expr2;
+non terminal Expr tuple_expr;
 
 
 non terminal Operator num_op;
@@ -100,12 +101,20 @@ num_op ::= PLUS             {: RESULT = new PlusOperator(); :}
 expr ::= IDENT:i            {: RESULT = new ID(i); :}
             |num_expr:e     {: RESULT = e; :}
             |str_expr:e     {: RESULT = e; :}
-            |bool_expr2:e    {: RESULT = e; :}        
+            |bool_expr2:e    {: RESULT = e; :}       
+            |tuple_expr:e          {: RESULT = e; :} 
             ;
 
 bool_expr2 ::= SUPTRUE          {: RESULT = new BoolExpression2(true); :}
             | SUPFALSE         {: RESULT = new BoolExpression2(false); :}
             ;
+
+tuple_expr ::= LPAREN expr:e COMMA expr:e2 RPAREN
+                {:
+                    RESULT = new TupleExpression(e, e2);
+                :}
+            ;
+
 num_expr ::=  NUM:e
                 {:
                     RESULT = new IntExpression(e.intValue());
@@ -190,6 +199,9 @@ instr ::= instr:i SEMI simple_instr:si           {: i.add(si); RESULT = i; :}
         | simple_instr:si                        {: RESULT = new InstructionList(si); :}
         ;
 
+const_stat ::= CONST IDENT:i ASSIGN expr:e       {:  RESULT = new ConstInstruction(i, e); }
+                ;
+
 assign_stat ::= IDENT:i ASSIGN expr:e          {: 
         // Aquí obtenemos el tipo del símbolo basado en la expresión
         SymbolType type;
@@ -197,7 +209,7 @@ assign_stat ::= IDENT:i ASSIGN expr:e          {:
             type = SymbolType.INTEGER;
         } else if (e instanceof StringExpression) {
             type = SymbolType.STRING;
-        } else if (e instanceof BooleanExpression) {
+        } else if (e instanceof BoolExpression2) {
             type = SymbolType.BOOLEAN;
         } else if (e instanceof OperatorExpression) {
             type = SymbolType.INTEGER;
@@ -212,7 +224,9 @@ assign_stat ::= IDENT:i ASSIGN expr:e          {:
 RESULT = new AssignInstruction(i,e); :}
                 ;
 
-if_stat ::= IF bool_expr:c THEN simple_instr:s                          {: RESULT = new IfInstruction(c, s); :}
+if_stat ::= IF bool_expr2:c THEN simple_instr:s                          {: RESULT = new IfInstruction(c, s); :}
+            | IF bool_expr2:c THEN simple_instr:s ELSE simple_instr:s2   {:  RESULT = new IfElseInstruction(c, s, s2); :}
+            | IF bool_expr:c THEN simple_instr:s                        {: RESULT = new IfInstruction(c, s); :}
             | IF bool_expr:c THEN simple_instr:s ELSE simple_instr:s2   {:  RESULT = new IfElseInstruction(c, s, s2); :}
             ;
 

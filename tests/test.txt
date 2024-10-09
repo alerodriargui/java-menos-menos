@@ -9,11 +9,15 @@ begin
 	c := --c;
 	print(c);
 	
-
+	e := (5, 10);
+	print(e);
+	
 	if (a < 5) then
 		a := 0 - a;
 	print (a);
-	d := supfalse;
+	d := suptrue;
+	if (d = suptrue) then
+		print(d);
 	print(d);
 	b := 10;
 	while (b > 1) do
