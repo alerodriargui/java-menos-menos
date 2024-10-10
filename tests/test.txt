@@ -15,16 +15,16 @@ begin
 	if (d = true && a < 5) then print(d);
 	if (d = false) then print(d) else print(e);	
 	if (a < 5) then a := 0 - a;
-	print (a);
+	print(a);
 	b := 10;
 	while (b > 1) do
 	begin
-		print (b);
+		print(b);
 		b := b - 1
 	end;
 	const p := 24145;
 	print(p);
-	s1 := "asd";
+	s1 := "as d";
 	s2 := "dsa";
 	s3 := concatenate(s1, s2);
 	print(s3);

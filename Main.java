@@ -715,7 +715,8 @@ class StrEnterExpression implements Expr
 	public Object run(HashMap<String, Object> hm)
 	{
 		java.util.Scanner in = new java.util.Scanner(System.in);
-		return in.next();
+		String s = in.nextLine();
+		return s;
 	}
 }
 
