@@ -125,7 +125,7 @@ A continuación, se presenta una lista de todas las características que debe te
     - [x] Asignación
     - [x] Condicional
     - [ ] Selección múltiple*
-    - [x] Bucles:
+    - [x] Bucles (solo necesario 2):
         - [x] Mientras
         - [x] Repetir hasta
         - [ ] Para
