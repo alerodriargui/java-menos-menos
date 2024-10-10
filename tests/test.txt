@@ -23,7 +23,12 @@ begin
 		b := b - 1
 	end;
 	const p := 24145;
+	p := ++p;
 	print(p);
+	const tester := true;
+	print(tester);
+	tester := false;
+	print(tester);
 	s1 := "as d";
 	s2 := "dsa";
 	s3 := concatenate(s1, s2);

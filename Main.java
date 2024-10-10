@@ -601,11 +601,27 @@ class BoolExpression2 implements Expr{
 class BooleanExpression implements Expr
 {
 	Boolean value;
+	Boolean isConst = false;
 
-	public BooleanExpression(Boolean e)
-	{
-		value = e;
-	}
+	// Constructor with both parameters
+    public BooleanExpression(Boolean e, Boolean isConst) {
+
+		if(isConst && e == null){
+			System.out.println("Error: null value for constant");
+			System.exit(1);
+		}
+        this.value = e;
+        this.isConst = isConst;
+    }
+
+    // Constructor with only the value parameter, defaults isConst to false
+    public BooleanExpression(Boolean e) {
+		if(isConst && e == null){
+			System.out.println("Error: null value for constant");
+			System.exit(1);
+		}
+        this.value = e;
+    }
 
 	public Object run(HashMap<String, Object> hm)
 	{
