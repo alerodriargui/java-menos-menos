@@ -2,7 +2,7 @@ begin
 	integer a := 1;
 	integer b := 2;
 	integer c := a + b;
-    print (c);
+    print(c);
 	c := ++c;
 	print(c);
 
@@ -11,9 +11,9 @@ begin
 	
 	tup e := (5, 10);
 	print(e);
-	boolean d := suptrue;
-	if (d = suptrue && a < 5) then print(d);
-	if (d = supfalse) then print(d) else print(e);	
+	boolean d := true;
+	if (d = true && a < 5) then print(d);
+	if (d = false) then print(d) else print(e);	
 	if (a < 5) then a := 0 - a;
 	print (a);
 	b := 10;

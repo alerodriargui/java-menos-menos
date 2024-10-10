@@ -136,8 +136,8 @@ const_expr ::= NUM:e
                 :}
             ;
 
-bool_expr2 ::= SUPTRUE          {: RESULT = new BoolExpression2(true); :}
-            | SUPFALSE         {: RESULT = new BoolExpression2(false); :}
+bool_expr2 ::= TRUE          {: RESULT = new BoolExpression2(true); :}
+            | FALSE         {: RESULT = new BoolExpression2(false); :}
             ;
 num_expr ::=  NUM:e
                 {:
@@ -201,8 +201,8 @@ str_rel ::= STREQ     {: RESULT = new StrEqCond(); :}
           | STRNOTEQ  {: RESULT = new StrNotEqCond(); :}
           ; 
 
-bool_expr ::= TRUE                               {: RESULT = new BooleanExpression(true); :}
-            | FALSE                              {: RESULT = new BooleanExpression(false); :}
+bool_expr ::= SUPTRUE                               {: RESULT = new BooleanExpression(true); :}
+            | SUPFALSE                              {: RESULT = new BooleanExpression(false); :}
             | LPAREN bool_expr:e RPAREN          {: RESULT = new PBooleanExpression(e); :}
             | NOT bool_expr:e                    {: RESULT = new NegationBooleanExpression(e); :}
             | bool_expr:e AND bool_expr:e2       {: RESULT = new AndBooleanExpression(e, e2); :}
