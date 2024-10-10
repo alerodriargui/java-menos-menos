@@ -68,6 +68,7 @@ non terminal Expr str_expr;
 non terminal Expr bool_expr;
 non terminal Expr bool_expr2;
 non terminal Expr tuple_expr;
+non terminal Expr const_expr;
 
 
 non terminal Operator num_op;
@@ -115,6 +116,23 @@ expr ::= IDENT:i            {: RESULT = new ID(i); :}
 tuple_expr ::= LPAREN expr:e COMMA expr:e2 RPAREN
                 {:
                     RESULT = new TupleExpression(e, e2);
+                :}
+            ;
+const_expr ::= NUM:e
+                {:
+                    RESULT = new IntExpression(e.intValue());
+                :}
+            | STRING:s
+                {:
+                    RESULT = new StringExpression(s.substring(1, s.length()-1));
+                :}
+            | TRUE
+                {:
+                    RESULT = new BooleanExpression(true);
+                :}
+            | FALSE
+                {:
+                    RESULT = new BooleanExpression(false);
                 :}
             ;
 
@@ -205,7 +223,7 @@ simple_instr ::= assign_stat:si                  {: RESULT = si; :}
 instr ::= instr:i SEMI simple_instr:si           {: i.add(si); RESULT = i; :}
         | simple_instr:si                        {: RESULT = new InstructionList(si); :}
         ;
-assign_stat ::= INTEGER IDENT:i ASSIGN expr:e          {: 
+assign_stat ::= INTEGER IDENT:i ASSIGN num_expr:e          {: 
         // Aquí obtenemos el tipo del símbolo basado en la expresión
         SymbolType type;
         if (e instanceof IntExpression) {
@@ -218,7 +236,7 @@ assign_stat ::= INTEGER IDENT:i ASSIGN expr:e          {:
 
         RESULT = new AssignInstruction(i, e); 
     :}
-    | BOOLEAN IDENT:i ASSIGN expr:e           {: 
+    | BOOLEAN IDENT:i ASSIGN bool_expr2:e           {: 
         // En este caso, aseguramos que sea una expresión booleana válida
         SymbolType type;
         if (e instanceof BoolExpression2 || e instanceof BooleanExpression) {
@@ -233,7 +251,7 @@ assign_stat ::= INTEGER IDENT:i ASSIGN expr:e          {:
         RESULT = new AssignInstruction(i, e); 
 
     :}
-    | TUP IDENT:i ASSIGN expr:e         {:
+    | TUP IDENT:i ASSIGN tuple_expr:e         {:
 
         SymbolType type;
         if (e instanceof TupleExpression) {
@@ -247,11 +265,14 @@ assign_stat ::= INTEGER IDENT:i ASSIGN expr:e          {:
         
         RESULT = new AssignInstruction(i, e);
     :}
-    | CONST IDENT:i ASSIGN expr:e          {:
+    | CONST IDENT:i ASSIGN const_expr:e          {:
         // Comprobar si el identificador existe en la tabla de símbolos
         RESULT = new AssignInstruction(i, e);
     :}
     | IDENT:i ASSIGN expr:e                   {:
+
+        // ESTE VENDRÍA A SER UNA ASIGNACIÓN QUE NO TIENE VARIABLE
+
         // Comprobar si el identificador existe en la tabla de símbolos
         RESULT = new AssignInstruction(i, e);
     :}

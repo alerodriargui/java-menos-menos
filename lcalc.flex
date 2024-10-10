@@ -40,9 +40,9 @@ public ArrayList<ComplexSymbol> tokens = new ArrayList<>();
 
 %}
    
-
 LineTerminator = \r|\n|\r\n
 WhiteSpace     = {LineTerminator} | [ \t\f]
+LINE_COMMENT  = "$" [^\r\n]* [\r|\n|\r\n]?
 
 NUM = [0-9]+
 IDENT = [A-Za-z_][A-Za-z_0-9]*
@@ -110,6 +110,7 @@ STRING = \"([^\\\"]|\\.)*\"
     {NUM}      { return symbol(sym.NUM, Integer.parseInt(yytext())); }
     {IDENT}       { return symbol(sym.IDENT, new String(yytext()));}
     {STRING}      { return symbol(sym.STRING, new String(yytext())); }
+    {LINE_COMMENT}  {                                                 }
 
     {WhiteSpace}       { /* do nothing */ }   
     <<EOF>> { return symbol(sym.EOF); }

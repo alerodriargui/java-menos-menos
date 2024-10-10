@@ -29,6 +29,8 @@ begin
 	s3 := concatenate(s1, s2);
 	print(s3);
 
+	$probando comentario de linea
+
 	fileout("FILETEST.txt", s3);
 
 
