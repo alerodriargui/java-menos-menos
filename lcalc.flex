@@ -47,7 +47,6 @@ WhiteSpace     = {LineTerminator} | [ \t\f]
 NUM = [0-9]+
 IDENT = [A-Za-z_][A-Za-z_0-9]*
 STRING = \"([^\\\"]|\\.)*\"
-
 %%
    
 <YYINITIAL> {
@@ -69,6 +68,11 @@ STRING = \"([^\\\"]|\\.)*\"
     "else"            { return symbol(sym.ELSE); }
     "while"           { return symbol(sym.WHILE); }
     "do"              { return symbol(sym.DO); }
+
+    "integer"         { return symbol(sym.INTEGER); }
+    "boolean"         { return symbol(sym.BOOLEAN); }
+    "const"           { return symbol(sym.CONST); }
+    "tup"             { return symbol(sym.TUP); }
 
     "print"           { return symbol(sym.PRINT); }
     "readint"         { return symbol(sym.READINT); }

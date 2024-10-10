@@ -1,7 +1,7 @@
 begin
-	a := 1;
-	b := 2;
-	c := a + b;
+	integer a := 1;
+	integer b := 2;
+	integer c := a + b;
     print (c);
 	c := ++c;
 	print(c);
@@ -9,9 +9,9 @@ begin
 	c := --c;
 	print(c);
 	
-	e := (5, 10);
+	tup e := (5, 10);
 	print(e);
-	d := suptrue;
+	boolean d := suptrue;
 	if (d = suptrue && a < 5) then print(d);
 	if (d = supfalse) then print(d) else print(e);	
 	if (a < 5) then a := 0 - a;
@@ -22,7 +22,8 @@ begin
 		print (b);
 		b := b - 1
 	end;
-
+	const p := 24145;
+	print(p);
 	s1 := "asd";
 	s2 := "dsa";
 	s3 := concatenate(s1, s2);
