@@ -1,10 +1,13 @@
 package core.error;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ErrorHandler {
     private List<Error> errors;
 
     public ErrorHandler() {
-        errors = new ArrayList<>();
+        errors = new ArrayList<Error>();
     }
 
     public void addError(String message, int line, int column) {
@@ -13,7 +16,7 @@ public class ErrorHandler {
 
     public void printErrors() {
         for (Error error : errors) {
-            System.out.println(error);
+            System.err.println(error);
         }
     }
 
