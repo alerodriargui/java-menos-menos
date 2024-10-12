@@ -1,10 +1,12 @@
 package core.intermediate;
 
+import core.symbol.SymbolTable;
+
 public class Assembly {
-    private ThreeAddressCode threeAddressCode;
+    private TresDirCode threeAddressCode;
     private SymbolTable symbolTable;
 
-    public Assembly(ThreeAddressCode threeAddressCode, SymbolTable symbolTable) {
+    public Assembly(TresDirCode threeAddressCode, SymbolTable symbolTable) {
         this.threeAddressCode = threeAddressCode;
         this.symbolTable = symbolTable;
     }
