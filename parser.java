@@ -510,18 +510,31 @@ public class parser extends java_cup.runtime.lr_parser {
     }
 
     public void report_error(String message, Object info) {
-        StringBuilder m = new StringBuilder("Error");
-        if (info instanceof java_cup.runtime.Symbol) {
-            java_cup.runtime.Symbol s = ((java_cup.runtime.Symbol) info);
-            if (s.left >= 0) {                
-                m.append(" in line "+(s.left+1));   
-                if (s.right >= 0)                    
-                    m.append(", column "+(s.right+1));
-            }
+        //add a small delay to see the error message
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
-        m.append(" : "+message);
+        StringBuilder m = new StringBuilder("Error");
+        if (info != null && info instanceof java_cup.runtime.Symbol) {
+            java_cup.runtime.Symbol s = (java_cup.runtime.Symbol) info;
+            if (s != null && s.left >= 0) { // Ensure s is not null
+                m.append(" in line " + (s.left + 1));
+                if (s.right >= 0) { // Safely access s.right
+                    m.append(", column " + (s.right + 1));
+                }
+        }
+        } else if (info == null) {
+            m.append(" : Null info object");
+        } else if (info instanceof core.symbol.Symbol){
+            core.symbol.Symbol s = (core.symbol.Symbol) info;
+            m.append(" : " + s.getName() + " := " + s.getValue());
+        }
+        m.append(" : " + message);
         System.err.println(m);
     }
+
    
     public void report_fatal_error(String message, Object info) {
         report_error(message, info);
@@ -1349,8 +1362,8 @@ class CUP$parser$actions {
         Symbol symbol = symbolTable.get(i.toString());
         if (symbol != null && symbol.isConstant()) {
             // Si ya existe, lanzar un error indicando que la constante ya fue definida
-            report_error("Constant " + i + " is already defined.", i);
-        return null;
+            report_fatal_error("Constant " + i + " is already defined.", symbol);
+            return null;
         } else {
             // Si no existe, agregarlo a la tabla de símbolos como constante
             SymbolType type;
@@ -1389,7 +1402,7 @@ class CUP$parser$actions {
     Symbol symbol = symbolTable.get(i.toString());
     if (symbol != null && symbol.isConstant()) {
         // Si ya existe, lanzar un error indicando que la constante ya fue definida
-        report_error("Constant " + i + " is already defined.", i);
+        report_fatal_error("Constant " + i + " is already defined.", symbol);
         return null;
     } else {
         // Si no existe, agregarlo a la tabla de símbolos como constante

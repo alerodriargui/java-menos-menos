@@ -27,7 +27,7 @@ begin
 	print(p);
 	const tester := true;
 	print(tester);
-	$tester := false;
+	tester := false;
 	print(tester);
 	s1 := "as d";
 	s2 := "dsa";
@@ -37,8 +37,6 @@ begin
 	$probando comentario de linea
 
 	fileout("FILETEST.txt", s3);
-
-
 	print(length(s3));
 	print(substring(s3, 1, 3));
 	print(position(s3, s2));

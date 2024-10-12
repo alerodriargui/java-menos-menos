@@ -10,12 +10,24 @@ public class SymbolTable {
 
     // Método para añadir un símbolo completo
     public void put(Symbol symbol) {
+        // Check if the symbol already exists and is a constant
+        Symbol existingSymbol = symbols.get(symbol.getName());
+        //System.out.println("Añadiendo símbolo: " + symbol.getName() + " (" + symbol.getType() + "): " + symbol.getValue() + " (constante: " + symbol.isConstant() + ")");
+        if (existingSymbol != null && existingSymbol.isConstant()) {
+            throw new IllegalArgumentException("Cannot reassign a constant: " + symbol.getName());
+        }
+        if(existingSymbol != null){
+            //System.out.println("Modificando el valor de " + symbol.getName() + " de " + existingSymbol.getValue() + " a " + symbol.getValue());
+        }
         symbols.put(symbol.getName(), symbol);
     }
 
     // Sobrecarga para facilidad de uso al añadir símbolos
     public void put(String name, Object value, SymbolType type, boolean isConstant) {
         Symbol symbol = new Symbol(name, value, type, isConstant);
+        if(isConstant){
+            //System.out.println("Constante: " + name + " = " + value);
+        }
         put(symbol);
     }
 
@@ -45,4 +57,15 @@ public class SymbolTable {
             System.err.println("Error al escribir en el archivo: " + e.getMessage());
         }
     }
+
+    public void setValue(String name, Object value) {
+        Symbol symbol = symbols.get(name);
+        if (symbol != null) {
+            symbol.setValue(value);
+        } else {
+            throw new IllegalArgumentException("Symbol not found: " + name);
+        }
+    }
+
+    
 }

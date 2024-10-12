@@ -30,6 +30,7 @@ public class Symbol {
     }
 
     public void setValue(Object value) {
+        //System.out.println("Modificando el valor de " + name + " de " + this.value + " a " + value);
         if (isConstant) {
             throw new UnsupportedOperationException("Cannot modify the value of a constant.");
         }
