@@ -2,6 +2,8 @@ import java.io.*;
 import java.util.*;
 import core.symbol.SymbolTable;
 import core.all.Tuple;
+import core.intermediate.TresDirCode;
+import core.intermediate.Assembly;
 import java.nio.charset.StandardCharsets;
 import java_cup.runtime.ComplexSymbolFactory;
 import java_cup.runtime.ComplexSymbolFactory.ComplexSymbol;
@@ -52,6 +54,10 @@ public class Main {
 			// Guardar la tabla de símbolos en un archivo
 			saveSymbolTableFile(p.getSymbolTable());
 			
+			//Back-end
+			TresDirCode tresDirCode = new TresDirCode();
+			Assembly assembly = new Assembly(tresDirCode, p.getSymbolTable());
+
 			if (result instanceof Main) {
 				((Main) result).exec();
 			} else {
@@ -989,6 +995,23 @@ class BeginEndInstruction implements SimpleInstruction
 	public BeginEndInstruction(InstructionList instructions)
 	{
 		this.instructions = instructions;
+	}
+
+	public void run(HashMap<String, Object> hm)
+	{
+		instructions.run(hm);
+	}
+}
+
+class BeginEndInstructionId implements SimpleInstruction
+{
+	private InstructionList instructions;
+	private String id;
+
+	public BeginEndInstructionId(InstructionList instructions, String id)
+	{
+		this.instructions = instructions;
+		this.id = id;
 	}
 
 	public void run(HashMap<String, Object> hm)

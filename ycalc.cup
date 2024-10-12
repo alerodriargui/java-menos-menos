@@ -215,6 +215,7 @@ simple_instr ::= assign_stat:si                  {: RESULT = si; :}
               | if_stat:si                       {: RESULT = si; :}
               | while_stat:si                    {: RESULT = si; :}
               | BEGIN instr:si END               {: RESULT = new BeginEndInstruction(si); :}
+              | BEGIN IDENT:i instr:si END       {: RESULT = new BeginEndInstructionId(si, i); :}
               | output_stat:si                   {: RESULT = si; :}
               | fileoutput_stat:si               {: RESULT = si; :}
               | EXIT                             {: System.exit(0); :}
