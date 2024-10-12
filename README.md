@@ -120,7 +120,7 @@ A continuación, se presenta una lista de todas las características que debe te
     - [x] Tuplas
     - [ ] Arreglos multidimensionales
 - [x] Declaración y uso de variables.
-- [ ] Constantes.
+- [x] Constantes.
 - [x] Operaciones implementadas:
     - [x] Asignación
     - [x] Condicional
@@ -134,7 +134,7 @@ A continuación, se presenta una lista de todas las características que debe te
     - [ ] Retorno de funciones (si se implementan).
 - [x] Expresiones aritméticas y lógicas:
     - [x] Usando literales.
-    - [ ] Usando constantes y variables.
+    - [x] Usando constantes y variables.
 - [x] Operaciones de entrada/salida:
     - [x] Entrada por teclado
     - [x] Salida por pantalla
