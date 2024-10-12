@@ -1,5 +1,10 @@
-a (INTEGER): IntExpression@2ed94a8b
-b (INTEGER): IntExpression@38082d64
-c (OTHER): OperatorExpression@dfd3711
-d (BOOLEAN): BoolExpression2@42d3bd8b
-e (TUPLE): TupleExpression@26ba2a48
+p (CONSTANT): 24145
+s3 (OTHER): ConcatStringExpression@5d099f62
+a (OTHER): OperatorExpression@37f8bb67
+b (OTHER): OperatorExpression@49c2faae
+c (OTHER): PreDecrementExpression@20ad9418
+d (BOOLEAN): BoolExpression2@31cefde0
+e (TUPLE): TupleExpression@439f5b3d
+tester (CONSTANT): true
+s1 (STRING): StringExpression@1d56ce6a
+s2 (STRING): StringExpression@5197848c

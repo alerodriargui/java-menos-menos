@@ -120,19 +120,19 @@ tuple_expr ::= LPAREN expr:e COMMA expr:e2 RPAREN
             ;
 const_expr ::= NUM:e
                 {:
-                    RESULT = new IntExpression(e.intValue());
+                    RESULT = new ConstIntExpression(e.intValue());
                 :}
             | STRING:s
                 {:
-                    RESULT = new StringExpression(s.substring(1, s.length()-1));
+                    RESULT = new ConstStringExpression(s.substring(1, s.length()-1));
                 :}
             | TRUE
                 {:
-                    RESULT = new BooleanExpression(true, true);
+                    RESULT = new ConstBooleanExpression(true);
                 :}
             | FALSE
                 {:
-                    RESULT = new BooleanExpression(false, true);
+                    RESULT = new ConstBooleanExpression(false);
                 :}
             ;
 
@@ -232,7 +232,7 @@ assign_stat ::= INTEGER IDENT:i ASSIGN num_expr:e          {:
             type = SymbolType.OTHER;
         }       
         // Añadir el símbolo a la tabla
-        symbolTable.put(i.toString(), e, type);
+        symbolTable.put(i.toString(), e, type, false);
 
         RESULT = new AssignInstruction(i, e); 
     :}
@@ -246,7 +246,7 @@ assign_stat ::= INTEGER IDENT:i ASSIGN num_expr:e          {:
             type = SymbolType.OTHER;
         }
         // Añadir el símbolo a la tabla
-        symbolTable.put(i.toString(), e, type);
+        symbolTable.put(i.toString(), e, type, false);
 
         RESULT = new AssignInstruction(i, e); 
 
@@ -261,18 +261,58 @@ assign_stat ::= INTEGER IDENT:i ASSIGN num_expr:e          {:
             type = SymbolType.OTHER;
         }
         // Añadir el símbolo a la tabla
-        symbolTable.put(i.toString(), e, type);
+        symbolTable.put(i.toString(), e, type, false);
         
         RESULT = new AssignInstruction(i, e);
     :}
     | CONST IDENT:i ASSIGN const_expr:e          {:
         // Comprobar si el identificador existe en la tabla de símbolos
+        Symbol symbol = symbolTable.get(i.toString());
+        if (symbol != null && symbol.isConstant()) {
+            // Si ya existe, lanzar un error indicando que la constante ya fue definida
+            report_error("Constant " + i + " is already defined.", i);
+        return null;
+        } else {
+            // Si no existe, agregarlo a la tabla de símbolos como constante
+            SymbolType type;
+            if (e instanceof ConstIntExpression) {
+                type = SymbolType.CONSTANT;
+            } else if (e instanceof ConstStringExpression) {
+                type = SymbolType.CONSTANT;
+            } else if (e instanceof ConstBooleanExpression) {
+                type = SymbolType.CONSTANT;
+            } else {
+                type = SymbolType.OTHER;
+            }
+
+            symbolTable.put(i.toString(), e, type, true);
+        }
         RESULT = new AssignInstruction(i, e);
+
     :}
     | IDENT:i ASSIGN expr:e                   {:
 
-        // ESTE VENDRÍA A SER UNA ASIGNACIÓN QUE NO TIENE VARIABLE
+    // ESTE VENDRÍA A SER UNA ASIGNACIÓN QUE NO TIENE VARIABLE
+    Symbol symbol = symbolTable.get(i.toString());
+    if (symbol != null && symbol.isConstant()) {
+        // Si ya existe, lanzar un error indicando que la constante ya fue definida
+        report_error("Constant " + i + " is already defined.", i);
+        return null;
+    } else {
+        // Si no existe, agregarlo a la tabla de símbolos como constante
+        SymbolType type;
+        if (e instanceof IntExpression) {
+            type = SymbolType.INTEGER;
+        } else if (e instanceof StringExpression) {
+            type = SymbolType.STRING;
+        } else if (e instanceof BooleanExpression) {
+            type = SymbolType.BOOLEAN;
+        } else {
+            type = SymbolType.OTHER;
+        }
 
+        symbolTable.put(i.toString(), e, type, false);
+    }
         // Comprobar si el identificador existe en la tabla de símbolos
         RESULT = new AssignInstruction(i, e);
     :}

@@ -138,6 +138,61 @@ class TupleExpression implements Expr {
     }
 }
 
+class ConstIntExpression extends IntExpression {
+    private final int value;
+
+    public ConstIntExpression(int value) {
+        super(value);
+        this.value = value;
+    }
+
+    public int getValue() {
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        return Integer.toString(value);
+    }
+}
+
+class ConstStringExpression extends StringExpression {
+    private final String value;
+
+    public ConstStringExpression(String value) {
+        super(value);
+        this.value = value;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        return "\"" + value + "\"";
+    }
+}
+
+class ConstBooleanExpression extends BooleanExpression {
+    private final boolean value;
+
+    public ConstBooleanExpression(boolean value) {
+        super(value, true); // El segundo argumento indica que es una constante
+        this.value = value;
+    }
+
+    public boolean getValue() {
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        return Boolean.toString(value);
+    }
+}
+
+
 
 /** VARS */
 class ID implements Expr

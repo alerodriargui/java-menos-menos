@@ -14,8 +14,8 @@ public class SymbolTable {
     }
 
     // Sobrecarga para facilidad de uso al añadir símbolos
-    public void put(String name, Object value, SymbolType type) {
-        Symbol symbol = new Symbol(name, value, type);
+    public void put(String name, Object value, SymbolType type, boolean isConstant) {
+        Symbol symbol = new Symbol(name, value, type, isConstant);
         put(symbol);
     }
 

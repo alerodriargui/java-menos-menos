@@ -6,5 +6,6 @@ public enum SymbolType {
     BOOLEAN,
     FUNCTION,
     TUPLE,
+    CONSTANT,
     OTHER
 }
