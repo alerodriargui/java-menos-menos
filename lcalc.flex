@@ -57,8 +57,8 @@ STRING = \"([^\\\"]|\\.)*\"
     "not"             { return symbol(sym.NOT); }
     "true"            { return symbol(sym.TRUE); }
     "false"           { return symbol(sym.FALSE); }
-    "suptrue"         { return symbol(sym.SUPTRUE); }
-    "supfalse"        { return symbol(sym.SUPFALSE); }
+    "supertrue"         { return symbol(sym.SUPTRUE); }
+    "superfalse"        { return symbol(sym.SUPFALSE); }
 
     "begin"           { return symbol(sym.BEGIN); }
     "end"             { return symbol(sym.END); }
