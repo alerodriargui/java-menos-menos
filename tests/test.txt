@@ -8,12 +8,13 @@ begin
 
 	c := --c;
 	print(c);
-	
 	tup e := (5, 10);
 	print(e);
 	boolean d := true;
 	if (d = true && a < 5) then print(d);
 	if (d = false) then print(d) else print(e);	
+	d := 1001;
+	print(d);
 	if (a < 5) then a := 0 - a;
 	print(a);
 	b := 10;
@@ -27,7 +28,7 @@ begin
 	print(p);
 	const tester := true;
 	print(tester);
-	tester := false;
+	$tester := false;
 	print(tester);
 	s1 := "as d";
 	s2 := "dsa";

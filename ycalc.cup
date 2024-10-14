@@ -78,8 +78,8 @@ terminal           TUP;
 non terminal Expr expr;
 non terminal Expr num_expr;
 non terminal Expr str_expr;
+non terminal Expr cond_expr;
 non terminal Expr bool_expr;
-non terminal Expr bool_expr2;
 non terminal Expr tuple_expr;
 non terminal Expr const_expr;
 
@@ -128,7 +128,7 @@ num_op ::= PLUS             {: RESULT = new PlusOperator(); :}
 expr ::= IDENT:i            {: RESULT = new ID(i); :}
             |num_expr:e     {: RESULT = e; :}
             |str_expr:e     {: RESULT = e; :}
-            |bool_expr2:e    {: RESULT = e; :} 
+            |bool_expr:e    {: RESULT = e; :} 
             |tuple_expr:e          {: RESULT = e; :} 
             ;
 
@@ -160,7 +160,7 @@ const_expr ::= NUM:e
 
 //Expresiones booleanas
 // z := true o z := false
-bool_expr2 ::= TRUE          {: RESULT = new BoolExpression2(true); :}
+bool_expr ::= TRUE          {: RESULT = new BoolExpression2(true); :}
             | FALSE         {: RESULT = new BoolExpression2(false); :}
             ;
 
@@ -237,13 +237,13 @@ z sería la expr, = sería el num_rel y 5 sería la expr2
 z es un ID.
 5 es un NUM que pertenece a num_expression.
 */
-bool_expr ::= SUPTRUE                               {: RESULT = new BooleanExpression(true); :}
+cond_expr ::= SUPTRUE                               {: RESULT = new BooleanExpression(true); :}
             | SUPFALSE                              {: RESULT = new BooleanExpression(false); :}
-            | LPAREN bool_expr:e RPAREN          {: RESULT = new PBooleanExpression(e); :}
-            | NOT bool_expr:e                    {: RESULT = new NegationBooleanExpression(e); :}
-            | bool_expr:e AND bool_expr:e2       {: RESULT = new AndBooleanExpression(e, e2); :}
-            | bool_expr:e OR bool_expr:e2        {: RESULT = new OrBooleanExpression(e, e2); :}
-            | expr: e num_rel:o expr:e2          {: RESULT = new ConditionBooleanExpression(e, o, e2); :}
+            | LPAREN cond_expr:e RPAREN          {: RESULT = new PBooleanExpression(e); :}
+            | NOT cond_expr:e                    {: RESULT = new NegationBooleanExpression(e); :}
+            | cond_expr:e AND cond_expr:e2       {: RESULT = new AndBooleanExpression(e, e2); :}
+            | cond_expr:e OR cond_expr:e2        {: RESULT = new OrBooleanExpression(e, e2); :}
+            | expr:e num_rel:o expr:e2           {: RESULT = new ConditionBooleanExpression(e, o, e2); :}
             | expr:s str_rel:o expr:s2           {: RESULT = new ConditionBooleanExpression(s, o, s2); :}
             ;
 
@@ -273,7 +273,7 @@ assign_stat ::= INTEGER IDENT:i ASSIGN num_expr:e          {:
 
         RESULT = new AssignInstruction(i, e); 
     :}
-    | BOOLEAN IDENT:i ASSIGN bool_expr2:e           {: 
+    | BOOLEAN IDENT:i ASSIGN bool_expr:e           {: 
         // En este caso, aseguramos que sea una expresión booleana válida
         SymbolType type;
         if (e instanceof BoolExpression2 || e instanceof BooleanExpression) {
@@ -330,24 +330,34 @@ assign_stat ::= INTEGER IDENT:i ASSIGN num_expr:e          {:
     | IDENT:i ASSIGN expr:e                   {:
 
     // ESTE VENDRÍA A SER UNA ASIGNACIÓN QUE NO TIENE VARIABLE
+    // Comprobar si el identificador ya existe en la tabla de símbolos
     Symbol symbol = symbolTable.get(i.toString());
-    if (symbol != null && symbol.isConstant()) {
-        // Si ya existe, lanzar un error indicando que la constante ya fue definida
-        report_fatal_error("Constant " + i + " is already defined.", symbol);
-        return null;
-    } else {
-        // Si no existe, agregarlo a la tabla de símbolos como constante
-        SymbolType type;
-        if (e instanceof IntExpression) {
-            type = SymbolType.INTEGER;
-        } else if (e instanceof StringExpression) {
-            type = SymbolType.STRING;
-        } else if (e instanceof BooleanExpression) {
-            type = SymbolType.BOOLEAN;
-        } else {
-            type = SymbolType.OTHER;
-        }
+    SymbolType type;
 
+    if (e instanceof IntExpression) {
+        type = SymbolType.INTEGER;
+    } else if (e instanceof StringExpression) {
+        type = SymbolType.STRING;
+    } else if (e instanceof BooleanExpression) {
+        type = SymbolType.BOOLEAN;
+    } else {
+        type = SymbolType.OTHER;
+    }
+
+    if (symbol != null) {
+        // Si el símbolo ya existe, comprobar si es constante
+        if (symbol.isConstant()) {
+            report_fatal_error("Constant " + i + " is already defined.", symbol);
+            return null;
+        }
+        // Comprobar si el tipo del nuevo valor coincide con el tipo del símbolo existente
+        if (symbol.getType() != type) {
+            report_fatal_error("Type mismatch: cannot assign a value of type " + type + " to variable " + i + " of type " + symbol.getType() + ".", symbol);
+            return null;
+        }
+        // Si el tipo coincide y no es constante, se permite la reasignación
+    } else {
+        // Si el símbolo no existe, agregarlo a la tabla de símbolos
         symbolTable.put(i.toString(), e, type, false);
     }
         // Comprobar si el identificador existe en la tabla de símbolos
@@ -355,12 +365,12 @@ assign_stat ::= INTEGER IDENT:i ASSIGN num_expr:e          {:
     :}
                 ;
 
-if_stat ::= IF bool_expr:c THEN simple_instr:s                          {: RESULT = new IfInstruction(c, s); :}
-            | IF bool_expr:c THEN simple_instr:s ELSE simple_instr:s2   {:  RESULT = new IfElseInstruction(c, s, s2); :}
+if_stat ::= IF cond_expr:c THEN simple_instr:s                          {: RESULT = new IfInstruction(c, s); :}
+            | IF cond_expr:c THEN simple_instr:s ELSE simple_instr:s2   {:  RESULT = new IfElseInstruction(c, s, s2); :}
             ;
 
-while_stat ::= WHILE bool_expr:c DO simple_instr:s       {: RESULT = new WhileInstruction(c, s); :}
-            | DO simple_instr:s WHILE bool_expr:c        {: RESULT = new DoWhileInstruction(c, s); :}
+while_stat ::= WHILE cond_expr:c DO simple_instr:s       {: RESULT = new WhileInstruction(c, s); :}
+            | DO simple_instr:s WHILE cond_expr:c        {: RESULT = new DoWhileInstruction(c, s); :}
             ;
 
 output_stat ::= PRINT LPAREN expr:e RPAREN               {: RESULT = new OutputInstruction(e); :}

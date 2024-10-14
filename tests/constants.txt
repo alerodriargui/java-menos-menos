@@ -1,0 +1,11 @@
+begin
+	const p := 24145;
+	$p := ++p;
+	print(p);
+
+	const tester := true;
+	print(tester);
+	$tester := false;
+	print(tester)
+    
+end

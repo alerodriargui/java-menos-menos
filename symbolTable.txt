@@ -3,7 +3,7 @@ s3 (OTHER): ConcatStringExpression@5d099f62
 a (OTHER): OperatorExpression@37f8bb67
 b (OTHER): OperatorExpression@49c2faae
 c (OTHER): PreDecrementExpression@20ad9418
-d (BOOLEAN): BoolExpression2@31cefde0
+d (INTEGER): IntExpression@31cefde0
 e (TUPLE): TupleExpression@439f5b3d
 tester (CONSTANT): true
 s1 (STRING): StringExpression@1d56ce6a
