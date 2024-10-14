@@ -112,6 +112,8 @@ start with program;
 /** ============= GRAMMAR ============= */
 
 /** done */
+
+//Operadores
 num_op ::= PLUS             {: RESULT = new PlusOperator(); :}
          | MINUS            {: RESULT = new MinusOperator(); :}
          | TIMES            {: RESULT = new TimesOperator(); :}
@@ -119,6 +121,10 @@ num_op ::= PLUS             {: RESULT = new PlusOperator(); :}
          | MODE             {: RESULT = new ModeOperator(); :}
          ;
 
+//Expresiones:
+/* 
+    Pueden ser: un ID, un numero, un booleano (true o false) o una tupla
+*/
 expr ::= IDENT:i            {: RESULT = new ID(i); :}
             |num_expr:e     {: RESULT = e; :}
             |str_expr:e     {: RESULT = e; :}
@@ -126,11 +132,14 @@ expr ::= IDENT:i            {: RESULT = new ID(i); :}
             |tuple_expr:e          {: RESULT = e; :} 
             ;
 
+//Tupla
 tuple_expr ::= LPAREN expr:e COMMA expr:e2 RPAREN
                 {:
                     RESULT = new TupleExpression(e, e2);
                 :}
             ;
+
+//Constantes
 const_expr ::= NUM:e
                 {:
                     RESULT = new ConstIntExpression(e.intValue());
@@ -149,9 +158,13 @@ const_expr ::= NUM:e
                 :}
             ;
 
+//Expresiones booleanas
+// z := true o z := false
 bool_expr2 ::= TRUE          {: RESULT = new BoolExpression2(true); :}
             | FALSE         {: RESULT = new BoolExpression2(false); :}
             ;
+
+//Expresiones numéricas
 num_expr ::=  NUM:e
                 {:
                     RESULT = new IntExpression(e.intValue());
@@ -184,6 +197,7 @@ num_expr ::=  NUM:e
             | DECREMENT expr:i      {: RESULT = new PreDecrementExpression(i); :}
             ;
 
+// Strings
 str_expr ::=  STRING:s
                 {:
                     RESULT = new StringExpression(s.substring(1, s.length()-1));
@@ -202,6 +216,7 @@ str_expr ::=  STRING:s
                 :}
              ;
 
+//Relaciones numéricas o booleanas (=, <>, <, >, <= >=)
 num_rel ::=   EQ         {: RESULT = new EqCond(); :}
             | LT         {: RESULT = new LtCond(); :}
             | LE         {: RESULT = new LeCond(); :}
@@ -210,10 +225,18 @@ num_rel ::=   EQ         {: RESULT = new EqCond(); :}
             | NE         {: RESULT = new NeCond(); :}
             ;
 
+// Relaciones SOLO STRINGS (==, !=)
 str_rel ::= STREQ     {: RESULT = new StrEqCond(); :}
           | STRNOTEQ  {: RESULT = new StrNotEqCond(); :}
           ; 
 
+// Condiciones booleanas
+/* 
+Ejemplo: Esto sería lo que hay dentro de un if: if (z = 5), se mete en el ConditionBooleanExpression
+z sería la expr, = sería el num_rel y 5 sería la expr2
+z es un ID.
+5 es un NUM que pertenece a num_expression.
+*/
 bool_expr ::= SUPTRUE                               {: RESULT = new BooleanExpression(true); :}
             | SUPFALSE                              {: RESULT = new BooleanExpression(false); :}
             | LPAREN bool_expr:e RPAREN          {: RESULT = new PBooleanExpression(e); :}
@@ -333,9 +356,7 @@ assign_stat ::= INTEGER IDENT:i ASSIGN num_expr:e          {:
                 ;
 
 if_stat ::= IF bool_expr:c THEN simple_instr:s                          {: RESULT = new IfInstruction(c, s); :}
-            | IF bool_expr2:c THEN simple_instr:s                        {: RESULT = new IfInstruction(c, s); :}
             | IF bool_expr:c THEN simple_instr:s ELSE simple_instr:s2   {:  RESULT = new IfElseInstruction(c, s, s2); :}
-            | IF bool_expr2:c THEN simple_instr:s ELSE simple_instr:s2   {:  RESULT = new IfElseInstruction(c, s, s2); :}
             ;
 
 while_stat ::= WHILE bool_expr:c DO simple_instr:s       {: RESULT = new WhileInstruction(c, s); :}

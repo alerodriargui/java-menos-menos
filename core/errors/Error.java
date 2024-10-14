@@ -1,4 +1,4 @@
-package core.error;
+package core.errors;
 
 public class Error {
     private String message;

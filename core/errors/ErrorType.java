@@ -1,4 +1,4 @@
-package core.error;
+package core.errors;
 
 public class ErrorType {
     public static final String LEXICAL = "Lexical error";

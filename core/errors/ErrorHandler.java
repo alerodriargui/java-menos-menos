@@ -1,4 +1,4 @@
-package core.error;
+package core.errors;
 
 import java.util.ArrayList;
 import java.util.List;
