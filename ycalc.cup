@@ -96,6 +96,7 @@ non terminal SimpleInstruction if_stat;
 non terminal SimpleInstruction while_stat;
 non terminal SimpleInstruction output_stat;
 non terminal SimpleInstruction fileoutput_stat;
+non terminal SimpleInstruction begin_end_instr;
 non terminal Main program;
 
 /** Precedence */
@@ -248,18 +249,23 @@ cond_expr ::= SUPTRUE                               {: RESULT = new BooleanExpre
             ;
 
 simple_instr ::= assign_stat:si                  {: RESULT = si; :}
-              | if_stat:si                       {: RESULT = si; :}
-              | while_stat:si                    {: RESULT = si; :}
-              | BEGIN instr:si END               {: RESULT = new BeginEndInstruction(si); :}
-              | BEGIN IDENT:i instr:si END       {: RESULT = new BeginEndInstructionId(si, i); :}
-              | output_stat:si                   {: RESULT = si; :}
-              | fileoutput_stat:si               {: RESULT = si; :}
-              | EXIT                             {: System.exit(0); :}
-              ;
+               | if_stat:si                       {: RESULT = si; :}
+               | while_stat:si                    {: RESULT = si; :}
+               | output_stat:si                   {: RESULT = si; :}
+               | fileoutput_stat:si               {: RESULT = si; :}
+               | EXIT                             {: System.exit(0); :}
+               | begin_end_instr:si               {: RESULT = si; :}
+               ;
+
+begin_end_instr ::= BEGIN instr:si END               {: RESULT = new BeginEndInstruction(si); :}
+                  | BEGIN IDENT:i instr:si END       {: RESULT = new BeginEndInstructionId(si, i); :}
+                  ;
 
 instr ::= instr:i SEMI simple_instr:si           {: i.add(si); RESULT = i; :}
         | simple_instr:si                        {: RESULT = new InstructionList(si); :}
         ;
+
+
 assign_stat ::= INTEGER IDENT:i ASSIGN num_expr:e          {: 
         // Aquí obtenemos el tipo del símbolo basado en la expresión
         SymbolType type;
