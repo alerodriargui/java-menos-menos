@@ -1,4 +1,5 @@
-begin hola
+func main
+begin
 	integer a := 1;
 	integer b := 2;
 	integer c := a + b;
@@ -48,3 +49,4 @@ begin hola
 	print("enter int, I will print it");
 	print(readint)
 end
+endfunc

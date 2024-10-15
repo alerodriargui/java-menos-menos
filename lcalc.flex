@@ -74,6 +74,10 @@ STRING = \"([^\\\"]|\\.)*\"
     "const"           { return symbol(sym.CONST); }
     "tup"             { return symbol(sym.TUP); }
 
+    "func"            { return symbol(sym.FUNC); }
+    "endfunc"         { return symbol(sym.ENDFUNC); } 
+    "main"            { return symbol(sym.MAIN); }  
+
     "print"           { return symbol(sym.PRINT); }
     "readint"         { return symbol(sym.READINT); }
     "length"          { return symbol(sym.LENGTH); }

@@ -72,6 +72,10 @@ terminal           INTEGER;
 terminal           CONST;
 terminal           TUP;
 
+terminal           FUNC;
+terminal           ENDFUNC;
+terminal           MAIN;
+
 
 
 /** Non-terminals **/
@@ -98,6 +102,7 @@ non terminal SimpleInstruction output_stat;
 non terminal SimpleInstruction fileoutput_stat;
 non terminal SimpleInstruction begin_end_instr;
 non terminal Main program;
+non terminal MainInstructionList main_instr;
 
 /** Precedence */
 precedence left PLUS, MINUS;
@@ -265,7 +270,6 @@ instr ::= instr:i SEMI simple_instr:si           {: i.add(si); RESULT = i; :}
         | simple_instr:si                        {: RESULT = new InstructionList(si); :}
         ;
 
-
 assign_stat ::= INTEGER IDENT:i ASSIGN num_expr:e          {: 
         // Aquí obtenemos el tipo del símbolo basado en la expresión
         SymbolType type;
@@ -385,7 +389,13 @@ output_stat ::= PRINT LPAREN expr:e RPAREN               {: RESULT = new OutputI
 fileoutput_stat ::= FILEOUT LPAREN expr:s COMMA expr:s2 RPAREN    {: RESULT = new FileOutputInstruction(s, s2); :}
             ;
 
-program ::= instr:i
+main_instr ::= FUNC MAIN instr:i ENDFUNC
+            {:
+                RESULT = new MainInstructionList(i);  
+            :}
+            ;
+
+program ::= main_instr:i
           {:
             RESULT = new Main(i);  // Devuelve una instancia de Main
           :}

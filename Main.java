@@ -24,9 +24,9 @@ interface IfInstructionI extends SimpleInstruction {void run(HashMap<String, Obj
 public class Main {
 
 	private HashMap<String, Object> hm = new HashMap<>();
-	private InstructionList instructionList;
+	private MainInstructionList instructionList;
 
-	public Main(InstructionList instructionList)
+	public Main(MainInstructionList instructionList)
 	{
 		this.instructionList = instructionList;
 	}
@@ -898,6 +898,27 @@ class InstructionList
 			si.run(hm);
 		}
 	}
+}
+
+class MainInstructionList
+{
+	private List<InstructionList> instructionLists;
+
+	public MainInstructionList(InstructionList il){
+		instructionLists = new ArrayList<InstructionList>();
+		instructionLists.add(il);
+	}
+
+	public void add(InstructionList il) {
+		instructionLists.add(il);
+	}
+
+	public void run(HashMap<String, Object> hm){
+		for (InstructionList il: instructionLists) {
+			il.run(hm);
+		}
+	}
+
 }
 
 class ConstInstruction implements SimpleInstruction {

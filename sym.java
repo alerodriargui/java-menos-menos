@@ -30,6 +30,7 @@ public class sym {
   public static final int NUM = 45;
   public static final int PLUS = 36;
   public static final int EXIT = 11;
+  public static final int MAIN = 54;
   public static final int ASSIGN = 25;
   public static final int IF = 12;
   public static final int LE = 28;
@@ -37,6 +38,7 @@ public class sym {
   public static final int EOF = 0;
   public static final int TRUE = 5;
   public static final int error = 1;
+  public static final int ENDFUNC = 53;
   public static final int MODE = 40;
   public static final int FILEOUT = 24;
   public static final int IDENT = 46;
@@ -45,6 +47,7 @@ public class sym {
   public static final int TUP = 51;
   public static final int SUPTRUE = 7;
   public static final int ELSE = 14;
+  public static final int FUNC = 52;
   public static final int POSITION = 20;
   public static final int WHILE = 15;
   public static final int THEN = 13;
@@ -110,7 +113,10 @@ public class sym {
   "BOOLEAN",
   "INTEGER",
   "CONST",
-  "TUP"
+  "TUP",
+  "FUNC",
+  "ENDFUNC",
+  "MAIN"
   };
 }
 
