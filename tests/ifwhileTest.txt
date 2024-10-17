@@ -1,0 +1,24 @@
+func main
+begin
+
+    integer a := 1;
+    while (a<3) do
+    begin
+        print(a);
+        integer c := 5;
+        integer d := 1;
+        a := 4;
+    end;
+
+    if (a =4) then
+    begin
+        a := 15;
+        print (a);
+    else
+        print (a);
+        print (a + 100);
+    end;
+
+    print("acabado");
+end
+endfunc

@@ -5,6 +5,8 @@ import core.all.Tuple;
 import core.intermediate.TresDirCode;
 import core.intermediate.Assembly;
 import java.nio.charset.StandardCharsets;
+
+import core.symbol.SymbolType;
 import java_cup.runtime.ComplexSymbolFactory;
 import java_cup.runtime.ComplexSymbolFactory.ComplexSymbol;
 import java_cup.runtime.SymbolFactory;
@@ -204,10 +206,12 @@ class ConstBooleanExpression extends BooleanExpression {
 class ID implements Expr
 {
 	String name;
+	//SymbolType type;
 
 	public ID(String s)
 	{
 		name = s;
+		//type = t;
 	}
 
 	public Object run(HashMap<String,Object> hm)
@@ -936,18 +940,18 @@ class ConstInstruction implements SimpleInstruction {
 class WhileInstruction implements WhileInstructionI
 {
 	Expr cond;
-	SimpleInstruction si;
+	InstructionList il;
 
-	public WhileInstruction(Expr c, SimpleInstruction s)
+	public WhileInstruction(Expr c, InstructionList il)
 	{
 		cond = c;
-		si = s;
+		this.il = il;
 	}
 
 	public void run(HashMap<String, Object> hm)
 	{
 		while ((Boolean)cond.run(hm)){
-			si.run(hm);
+			il.run(hm);
 		}
 	}
 }
@@ -955,18 +959,18 @@ class WhileInstruction implements WhileInstructionI
 class DoWhileInstruction implements WhileInstructionI
 {
 	Expr cond;
-	SimpleInstruction si;
+	InstructionList il;
 
-	public DoWhileInstruction(Expr c, SimpleInstruction s)
+	public DoWhileInstruction(Expr c, InstructionList s)
 	{
 		cond = c;
-		si = s;
+		il = s;
 	}
 
 	public void run(HashMap<String, Object> hm)
 	{
 		do
-			si.run(hm);
+			il.run(hm);
 		while ((Boolean)cond.run(hm));
 	}
 }
@@ -974,16 +978,16 @@ class DoWhileInstruction implements WhileInstructionI
 class IfInstruction implements IfInstructionI {
 
 	Expr condition;
-	SimpleInstruction simpleInstruction;
+	InstructionList il;
 
-	public IfInstruction (Expr condition, SimpleInstruction simpleInstruction) {
+	public IfInstruction (Expr condition, InstructionList il) {
 		this.condition = condition;
-		this.simpleInstruction = simpleInstruction;
+		this.il = il;
 	}
 
 	public void run(HashMap<String, Object> hm){
 		if ((Boolean)condition.run(hm)) {
-			simpleInstruction.run(hm);
+			il.run(hm);
 		}
 	}
 }
@@ -991,20 +995,20 @@ class IfInstruction implements IfInstructionI {
 class IfElseInstruction implements IfInstructionI {
 
 	Expr condition;
-	SimpleInstruction simpleInstruction;
-	SimpleInstruction simpleInstruction2;
+	InstructionList instructionList;
+	InstructionList instructionList2;
 
-	public IfElseInstruction (Expr condition, SimpleInstruction simpleInstruction, SimpleInstruction simpleInstruction2) {
+	public IfElseInstruction (Expr condition, InstructionList simpleInstruction, InstructionList simpleInstruction2) {
 		this.condition = condition;
-		this.simpleInstruction = simpleInstruction;
-		this.simpleInstruction2 = simpleInstruction2;
+		this.instructionList = simpleInstruction;
+		this.instructionList2 = simpleInstruction2;
 	}
 
 	public void run(HashMap<String, Object> hm){
 		if ((Boolean)condition.run(hm)) {
-			simpleInstruction.run(hm);
+			instructionList.run(hm);
 		} else {
-			simpleInstruction2.run(hm);
+			instructionList2.run(hm);
 		}
 	}
 }

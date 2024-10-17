@@ -12,8 +12,8 @@ begin
 	tup e := (5, 10);
 	print(e);
 	boolean d := true;
-	if (d = true && a < 5) then print(d);
-	if (d = false) then print(d) else print(e);	
+	if (d = true && a < 5) then begin print(d); end;
+	if (d = false) then begin print(d); else print(e); end;
 	$d := 1001;
 	print(d);
 	$if (a < 5) then a := 0 - a;
@@ -21,10 +21,9 @@ begin
 	b := 2;
 	while (b = 1) do
 	begin
-		print(b);
-		b := 1
+		print(--b);
 	end;
-	if supertrue then print(b);
+	if supertrue then begin print(b); end;
 	const p := 24145;
 	$p := ++p;
 	print(p);
@@ -47,6 +46,6 @@ begin
 	print(readstr);
 
 	print("enter int, I will print it");
-	print(readint)
+	print(readint);
 end
 endfunc

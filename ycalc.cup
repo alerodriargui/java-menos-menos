@@ -92,8 +92,9 @@ non terminal Operator num_op;
 non terminal Condition num_rel;
 non terminal Condition str_rel;
 
+non terminal SimpleInstruction instruction;
 non terminal SimpleInstruction simple_instr;
-non terminal InstructionList instr;
+non terminal InstructionList instructions;
 
 non terminal SimpleInstruction assign_stat;
 non terminal SimpleInstruction if_stat;
@@ -253,21 +254,19 @@ cond_expr ::= SUPTRUE                               {: RESULT = new BooleanExpre
             | expr:s str_rel:o expr:s2           {: RESULT = new ConditionBooleanExpression(s, o, s2); :}
             ;
 
-simple_instr ::= assign_stat:si                  {: RESULT = si; :}
-               | if_stat:si                       {: RESULT = si; :}
-               | while_stat:si                    {: RESULT = si; :}
-               | output_stat:si                   {: RESULT = si; :}
-               | fileoutput_stat:si               {: RESULT = si; :}
-               | EXIT                             {: System.exit(0); :}
-               | begin_end_instr:si               {: RESULT = si; :}
+simple_instr ::= assign_stat:si SEMI                  {: RESULT = si; :}
+               | output_stat:si SEMI                  {: RESULT = si; :}
+               | fileoutput_stat:si SEMI              {: RESULT = si; :}
+               | EXIT SEMI                            {: System.exit(0); :}
                ;
 
-begin_end_instr ::= BEGIN instr:si END               {: RESULT = new BeginEndInstruction(si); :}
-                  | BEGIN IDENT:i instr:si END       {: RESULT = new BeginEndInstructionId(si, i); :}
-                  ;
+instruction ::= if_stat:si                      {: RESULT = si; :}
+                | while_stat:si                   {: RESULT = si; :}
+                | simple_instr:si               {: RESULT = si; :}
+                ;
 
-instr ::= instr:i SEMI simple_instr:si           {: i.add(si); RESULT = i; :}
-        | simple_instr:si                        {: RESULT = new InstructionList(si); :}
+instructions ::= instructions:i instruction:si           {: i.add(si); RESULT = i; :}
+        | instruction:si                        {: RESULT = new InstructionList(si); :}
         ;
 
 assign_stat ::= INTEGER IDENT:i ASSIGN num_expr:e          {: 
@@ -375,12 +374,12 @@ assign_stat ::= INTEGER IDENT:i ASSIGN num_expr:e          {:
     :}
                 ;
 
-if_stat ::= IF cond_expr:c THEN simple_instr:s                          {: RESULT = new IfInstruction(c, s); :}
-            | IF cond_expr:c THEN simple_instr:s ELSE simple_instr:s2   {:  RESULT = new IfElseInstruction(c, s, s2); :}
+if_stat ::= IF cond_expr:c THEN BEGIN instructions:s ELSE instructions:s2 END SEMI   {:  RESULT = new IfElseInstruction(c, s, s2); :}
+            | IF cond_expr:c THEN BEGIN instructions:s END SEMI                          {: RESULT = new IfInstruction(c, s); :}
             ;
 
-while_stat ::= WHILE cond_expr:c DO simple_instr:s       {: RESULT = new WhileInstruction(c, s); :}
-            | DO simple_instr:s WHILE cond_expr:c        {: RESULT = new DoWhileInstruction(c, s); :}
+while_stat ::= WHILE cond_expr:c DO BEGIN instructions:s END SEMI      {: RESULT = new WhileInstruction(c, s); :}
+            | DO instructions:s WHILE cond_expr:c SEMI       {: RESULT = new DoWhileInstruction(c, s); :}
             ;
 
 output_stat ::= PRINT LPAREN expr:e RPAREN               {: RESULT = new OutputInstruction(e); :}
@@ -389,7 +388,7 @@ output_stat ::= PRINT LPAREN expr:e RPAREN               {: RESULT = new OutputI
 fileoutput_stat ::= FILEOUT LPAREN expr:s COMMA expr:s2 RPAREN    {: RESULT = new FileOutputInstruction(s, s2); :}
             ;
 
-main_instr ::= FUNC MAIN instr:i ENDFUNC
+main_instr ::= FUNC MAIN BEGIN instructions:i END ENDFUNC
             {:
                 RESULT = new MainInstructionList(i);  
             :}
