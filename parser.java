@@ -1261,7 +1261,7 @@ class CUP$parser$actions {
             type = SymbolType.OTHER;
         }       
         // Añadir el símbolo a la tabla
-        symbolTable.put(i.toString(), e, type, false);
+        symbolTable.put(i, e, type, false);
 
         RESULT = new AssignInstruction(i, e); 
     
@@ -1379,14 +1379,16 @@ class CUP$parser$actions {
 
     // ESTE VENDRÍA A SER UNA ASIGNACIÓN QUE NO TIENE VARIABLE
     // Comprobar si el identificador ya existe en la tabla de símbolos
-    Symbol symbol = symbolTable.get(i.toString());
+    Symbol symbol = symbolTable.get(i);
     SymbolType type;
 
-    if (e instanceof IntExpression) {
+    if(e instanceof ID) {
+        type = symbolTable.get(((ID) e).getName()).getType();
+    } else if (e instanceof IntExpression) {
         type = SymbolType.INTEGER;
     } else if (e instanceof StringExpression) {
         type = SymbolType.STRING;
-    } else if (e instanceof BooleanExpression) {
+    } else if (e instanceof BooleanExpression || e instanceof BoolExpression2) {
         type = SymbolType.BOOLEAN;
     } else {
         type = SymbolType.OTHER;
@@ -1403,12 +1405,13 @@ class CUP$parser$actions {
             report_fatal_error("Type mismatch: cannot assign a value of type " + type + " to variable " + i + " of type " + symbol.getType() + ".", symbol);
             return null;
         }
+        symbolTable.put(i,e,type,false);
         // Si el tipo coincide y no es constante, se permite la reasignación
     } else {
         // Si el símbolo no existe, agregarlo a la tabla de símbolos
-        symbolTable.put(i.toString(), e, type, false);
+        symbolTable.put(i, e, type, false);
     }
-        // Comprobar si el identificador existe en la tabla de símbolos
+
         RESULT = new AssignInstruction(i, e);
     
               CUP$parser$result = parser.getSymbolFactory().newSymbol("assign_stat",13, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
