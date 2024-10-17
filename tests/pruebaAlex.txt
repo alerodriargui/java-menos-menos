@@ -1,0 +1,19 @@
+func main
+begin mainBlock
+	integer a := 1;
+	integer b := 2;
+	integer c := a + b;
+    print(c);
+
+	// Llamar al bloque identificado
+	call myBlock;
+
+end
+
+// Definir el bloque identificado al final del programa
+begin myBlock
+    print("This is block myBlock");
+    integer x := 10;
+    print(x);
+end
+endfunc

@@ -6,4 +6,4 @@ java -cp .:lib/java-cup-11b.jar java_cup.Main < ycalc.cup
 javac -d bin -cp .:lib/java-cup-11b.jar Main.java
 
 #run
-java -cp bin:lib/java-cup-11b-runtime.jar Main tests/test.txt
+java -cp bin:lib/java-cup-11b-runtime.jar Main tests/pruebaAlex.txt

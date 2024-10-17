@@ -25,10 +25,13 @@ public class Main {
 
 	private HashMap<String, Object> hm = new HashMap<>();
 	private MainInstructionList instructionList;
+	private FunctionList functions;
 
-	public Main(MainInstructionList instructionList)
+	public Main(MainInstructionList instructionList, FunctionList functions)
 	{
 		this.instructionList = instructionList;
+		this.functions = functions;
+
 	}
 
 	public void exec()
@@ -1037,6 +1040,64 @@ class BeginEndInstructionId implements SimpleInstruction
 
 	public void run(HashMap<String, Object> hm)
 	{
+		System.out.println("Running block with ID: " + id);
 		instructions.run(hm);
+	}
+
+	public String getId() {
+		return id;
+	}
+}
+
+
+class Function {
+	private BeginEndInstructionId body; // Manteniendo el mismo tipo para el cuerpo
+	private String id;
+
+	public Function(String id, BeginEndInstructionId body) {
+		this.body = body;  // Asignación del cuerpo
+		this.id = id;      // Asignación del identificador
+	}
+
+	public void run(HashMap<String, Object> hm) {
+		System.out.println("Running function with ID: " + id); // Mensaje de inicio
+		body.run(hm); // Ejecutar el cuerpo de la función
+	}
+
+	public String getId() {
+		return id; // Devuelve el identificador
+	}
+}
+
+class FunctionList {
+		private List<Function> functions;
+
+		public FunctionList() {
+			this.functions = new ArrayList<>();
+		}
+
+		public void add(Function func) {
+			this.functions.add(func);
+		}
+
+		public Function getFunctionById(String id) {
+			for (Function func : functions) {
+				if (func.getId().equals(id)) {
+					return func;
+				}
+			}
+			return null;
+		}
+	}
+
+class FunctionRegistry {
+	private static HashMap<String, Function> functions = new HashMap<>();
+
+	public static void addFunction(Function func) {
+		functions.put(func.getId(), func);
+	}
+
+	public static Function getFunctionById(String id) {
+		return functions.get(id);
 	}
 }

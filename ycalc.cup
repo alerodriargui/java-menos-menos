@@ -54,7 +54,7 @@ terminal           AND, OR, NOT, TRUE, FALSE, SUPTRUE, SUPFALSE; // boolean
 // flow
 terminal           BEGIN, END, EXIT; 
 terminal           IF, THEN, ELSE; 
-terminal           WHILE, DO; 
+terminal           WHILE, DO;
 
 terminal           PRINT, READINT, LENGTH, POSITION, READSTR, CONCATENATE, SUBSTRING, FILEOUT;  // commands
 terminal           ASSIGN; 
@@ -75,6 +75,8 @@ terminal           TUP;
 terminal           FUNC;
 terminal           ENDFUNC;
 terminal           MAIN;
+
+terminal           CALL;
 
 
 
@@ -103,6 +105,11 @@ non terminal SimpleInstruction fileoutput_stat;
 non terminal SimpleInstruction begin_end_instr;
 non terminal Main program;
 non terminal MainInstructionList main_instr;
+
+non terminal SimpleInstruction call_instr;
+non terminal FunctionList funcs;
+non terminal Function func_decl;
+
 
 /** Precedence */
 precedence left PLUS, MINUS;
@@ -260,6 +267,7 @@ simple_instr ::= assign_stat:si                  {: RESULT = si; :}
                | fileoutput_stat:si               {: RESULT = si; :}
                | EXIT                             {: System.exit(0); :}
                | begin_end_instr:si               {: RESULT = si; :}
+               | call_instr:si                       {: RESULT = si; :}
                ;
 
 begin_end_instr ::= BEGIN instr:si END               {: RESULT = new BeginEndInstruction(si); :}
@@ -395,8 +403,39 @@ main_instr ::= FUNC MAIN instr:i ENDFUNC
             :}
             ;
 
-program ::= main_instr:i
+funcs ::= func_decl:f funcs:fs
           {:
-            RESULT = new Main(i);  // Devuelve una instancia de Main
+            fs.add(f);  // Agregar cada función a la lista de funciones
+            RESULT = fs;
+          :}
+        | /* vacío */
+          {:
+            RESULT = new FunctionList();  // Crea una lista vacía si no hay funciones
+          :}
+        ;
+
+
+func_decl ::= FUNC IDENT:id begin_end_instr:body
+              {:
+                Function func = new Function(id,(BeginEndInstructionId) body); // Crea una nueva función
+                FunctionRegistry.addFunction(func); // Registra la función
+              :}
+              ;
+
+call_instr ::= CALL IDENT:id SEMI
+              {:
+                Function func = FunctionRegistry.getFunctionById(id); // Obtener la función del registro
+                if (func != null) {
+                    func.run(hm);  // Llama a la función con el contexto
+                } else {
+                    System.out.println("Function " + id + " not found."); // Mensaje de error
+                }
+              :}
+              ;
+
+program ::= main_instr:i funcs:f
+          {:
+            RESULT = new Main(i, f);  // Devuelve una instancia de Main con las instrucciones y las funciones
           :}
           ;
+

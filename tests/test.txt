@@ -1,5 +1,5 @@
 func main
-begin
+begin prueba1
 	integer a := 1;
 	integer b := 2;
 	integer c := a + b;
@@ -48,5 +48,6 @@ begin
 
 	print("enter int, I will print it");
 	print(readint)
+
 end
 endfunc
