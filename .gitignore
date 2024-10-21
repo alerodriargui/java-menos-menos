@@ -5,3 +5,4 @@
 *.S68
 parser.java
 Lexer.java
+sym.java
