@@ -3,6 +3,6 @@
 .FILETEST.txt
 *.L68
 *.S68
-parser.java
-Lexer.java
-sym.java
+/parser.java
+/Lexer.java
+/sym.java
