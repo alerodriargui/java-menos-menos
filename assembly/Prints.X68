@@ -10,10 +10,10 @@ START:
     LEA     teststring, A1   ; point A1 to teststring
     JSR     PRINT_STRING      ; Jump to the PRINT_INT subroutine
     
-    MOVE.W  #1, D1
+    MOVE.W  #0, D1
     JSR     PRINT_BOOL
     
-    MOVE.W  #0, D1
+    JSR     READ_BOOL
     JSR     PRINT_BOOL
 
 
@@ -73,6 +73,48 @@ PRINT_BOOL:
     MOVE.W  (A7)+, D0        ; Restore D0 from stack
     RTS                      ; Return from subroutine
  
+ 
+; ----------------------------------------------------------------------------- 
+; READ_INT - READS AN INTEGER
+; INPUT: CONSOLE - INTEFER TO ADD
+; OUTPUT: D1 - INTEGER 
+; ----------------------------------------------------------------------------- 
+ 
+READ_INT:
+    MOVE.W  D0,-(A7)         ; Save D0 on stack (if needed elsewhere)
+    MOVE.W  #4,D0            ; Sytem call to read int;
+    TRAP    #15
+    MOVE.W  (A7)+, D0        ; Restore D0 from stack
+    RTS                      ; Return from subroutine
+
+READ_STRING:
+    MOVE.W  D0,-(A7)         ; Save D0 on stack (if needed elsewhere)
+    MOVE.W  #2,D0            ; Sytem call to read string;
+    TRAP    #15
+    MOVE.W  (A7)+, D0        ; Restore D0 from stack
+    RTS                      ; Return from subroutine
+
+READ_BOOL:
+    MOVE.W  D0,-(A7)         ; Save D0 on stack
+    LEA     bool_buffer, A1  ; Load the address of the boolean input buffer
+    JSR     READ_STRING      ; Read user input string into bool_buffer
+
+    MOVE.B  (A1),D0          ; Move the first character of the buffer into D0
+    CMP.B   #'F',D0          ; Compare with 'F'
+    BEQ     .READ_FALSE      ; If 'F', jump to READ_FALSE
+    CMP.B   #'f',D0          ; Compare with 'f'
+    BEQ     .READ_FALSE      ; If 'f', jump to READ_FALSE
+
+    MOVE.W  #1, D1           ; If not 'F' or 'f', assume it's 'T'/'t', so D1 = 1
+    BRA     .END_BOOL        ; Branch to the end
+
+.READ_FALSE:
+    MOVE.W  #0, D1           ; If 'F' or 'f', D1 = 0
+
+.END_BOOL:
+    MOVE.W  (A7)+, D0        ; Restore D0 from stack
+    RTS                      ; Return from subroutine
+
 
 ;---------------------------------------------------------------------
 ;TEST VARS
@@ -82,6 +124,7 @@ teststring DC.B 'JACINTO test',0   ; test string
                
 
     END     START          ; End of program, define start point
+
 
 
 
