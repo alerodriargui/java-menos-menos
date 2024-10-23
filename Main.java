@@ -206,12 +206,14 @@ class ConstBooleanExpression extends BooleanExpression {
 class ID implements Expr
 {
 	String name;
-	//SymbolType type;
 
 	public ID(String s)
 	{
 		name = s;
-		//type = t;
+	}
+
+	public String getName(){
+		return name;
 	}
 
 	public Object run(HashMap<String,Object> hm)

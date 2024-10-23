@@ -1,11 +1,25 @@
+func main
 begin
-	const p := 24145;
-	$p := ++p;
-	print(p);
+	boolean a := false;
+	boolean b := true;
+
+	a := b;
+	print(a);
+	print(b);
+
+	integer c := 17;
+
+	c:= 18;
+	print(c);
+
+	integer d := 19;
+	c := d;
+	print(c);
 
 	const tester := true;
 	print(tester);
 	$tester := false;
-	print(tester)
+	print(tester);
     
 end
+endfunc
