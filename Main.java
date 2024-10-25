@@ -25,12 +25,18 @@ interface IfInstructionI extends SimpleInstruction {void run(HashMap<String, Obj
    
 public class Main {
 
-	private HashMap<String, Object> hm = new HashMap<>();
-	private MainInstructionList instructionList;
+		private HashMap<String, Object> hm = new HashMap<>();
+		private MainInstructionList instructionList;
+		private List<Function> functionList;
 
 	public Main(MainInstructionList instructionList)
 	{
 		this.instructionList = instructionList;
+	}
+
+	public Main(MainInstructionList instructionList, List<Function> functionList) {
+		this.instructionList = instructionList;
+		this.functionList = functionList;
 	}
 
 	public void exec()
@@ -75,7 +81,7 @@ public class Main {
 	private static void saveSymbolTableFile(SymbolTable symbolTable) {
 		symbolTable.writeToFile("symbolTable.txt");
 	}
-	
+
 	// Método para guardar los tokens en un archivo
 	private static void saveTokensFile(ArrayList<ComplexSymbol> tokens) {
         try {
@@ -1035,14 +1041,4 @@ class BeginEndInstructionId implements SimpleInstruction
 	private InstructionList instructions;
 	private String id;
 
-	public BeginEndInstructionId(InstructionList instructions, String id)
-	{
-		this.instructions = instructions;
-		this.id = id;
-	}
-
-	public void run(HashMap<String, Object> hm)
-	{
-		instructions.run(hm);
-	}
-}
+	pu

@@ -95,6 +95,7 @@ non terminal Condition str_rel;
 non terminal SimpleInstruction instruction;
 non terminal SimpleInstruction simple_instr;
 non terminal InstructionList instructions;
+non terminal FunctionList functions;
 
 non terminal SimpleInstruction assign_stat;
 non terminal SimpleInstruction if_stat;
@@ -104,6 +105,10 @@ non terminal SimpleInstruction fileoutput_stat;
 non terminal SimpleInstruction begin_end_instr;
 non terminal Main program;
 non terminal MainInstructionList main_instr;
+
+non terminal List<Function> function_list;
+non terminal Function function;
+non terminal SimpleInstruction function_call;
 
 /** Precedence */
 precedence left PLUS, MINUS;
@@ -263,6 +268,7 @@ simple_instr ::= assign_stat:si SEMI                  {: RESULT = si; :}
 instruction ::= if_stat:si                      {: RESULT = si; :}
                 | while_stat:si                   {: RESULT = si; :}
                 | simple_instr:si               {: RESULT = si; :}
+                |function_call:si               {: RESULT = si; :}
                 ;
 
 instructions ::= instructions:i instruction:si           {: i.add(si); RESULT = i; :}
@@ -392,13 +398,4 @@ fileoutput_stat ::= FILEOUT LPAREN expr:s COMMA expr:s2 RPAREN    {: RESULT = ne
             ;
 
 main_instr ::= FUNC MAIN BEGIN instructions:i END ENDFUNC
-            {:
-                RESULT = new MainInstructionList(i);  
-            :}
-            ;
-
-program ::= main_instr:i
-          {:
-            RESULT = new Main(i);  // Devuelve una instancia de Main
-          :}
-          ;
+     
