@@ -27,11 +27,16 @@ public class Main {
 
 	private HashMap<String, Object> hm = new HashMap<>();
 	private MainInstructionList instructionList;
+    private List<Function> functionList;
 
 	public Main(MainInstructionList instructionList)
 	{
 		this.instructionList = instructionList;
 	}
+    public Main(MainInstructionList instructionList, List<Function> functionList) {
+        this.instructionList = instructionList;
+        this.functionList = functionList;
+    }
 
 	public void exec()
 	{
@@ -1045,4 +1050,41 @@ class BeginEndInstructionId implements SimpleInstruction
 	{
 		instructions.run(hm);
 	}
+}
+
+class Function {
+    private String name;
+    private List<InstructionList> instructionLists;
+
+    public Function(InstructionList il, String n) {
+        instructionLists = new ArrayList<>();
+        instructionLists.add(il);
+        name = n;
+    }
+
+    public void add(InstructionList il) {
+        instructionLists.add(il);
+    }
+
+    public void run(HashMap<String, Object> hm) {
+        for (InstructionList il : instructionLists) {
+            il.run(hm);
+        }
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public List<InstructionList> getInstructionLists() {
+        return instructionLists;
+    }
+
+    public void setInstructionLists(List<InstructionList> instructionLists) {
+        this.instructionLists = instructionLists;
+    }
 }

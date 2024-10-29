@@ -101,9 +101,11 @@ non terminal SimpleInstruction if_stat;
 non terminal SimpleInstruction while_stat;
 non terminal SimpleInstruction output_stat;
 non terminal SimpleInstruction fileoutput_stat;
-non terminal SimpleInstruction begin_end_instr;
 non terminal Main program;
 non terminal MainInstructionList main_instr;
+
+non terminal List<Function> function_list;
+non terminal Function function;
 
 /** Precedence */
 precedence left PLUS, MINUS;
@@ -391,14 +393,25 @@ output_stat ::= PRINT LPAREN expr:e RPAREN               {: RESULT = new OutputI
 fileoutput_stat ::= FILEOUT LPAREN expr:s COMMA expr:s2 RPAREN    {: RESULT = new FileOutputInstruction(s, s2); :}
             ;
 
+function ::= FUNC IDENT:i LPAREN RPAREN BEGIN instructions:li ENDFUNC {: RESULT = new Function(li, i); :}
+            ;
+
+function_list ::= function_list:fl function:f {: fl.add(f); RESULT = fl; :}
+                    | function:f {: RESULT = List.of(f); :}
+                    ;
+
 main_instr ::= FUNC MAIN BEGIN instructions:i END ENDFUNC
             {:
                 RESULT = new MainInstructionList(i);  
             :}
             ;
 
-program ::= main_instr:i
+program ::= main_instr:i function_list:fl
           {:
-            RESULT = new Main(i);  // Devuelve una instancia de Main
+            RESULT = new Main(i, fl);  // Devuelve una instancia de Main
+          :}
+          | main_instr:i
+          {:
+                  RESULT = new Main(i);  // Devuelve una instancia de Main
           :}
           ;

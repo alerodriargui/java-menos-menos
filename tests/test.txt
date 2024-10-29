@@ -49,3 +49,8 @@ begin
 	print(readint);
 end
 endfunc
+
+func prueba()
+begin
+print("enter string, I will print it");
+endfunc
