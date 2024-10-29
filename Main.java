@@ -910,9 +910,10 @@ class MainInstructionList
 {
 	private List<InstructionList> instructionLists;
 
-	public MainInstructionList(InstructionList il){
+	public MainInstructionList(InstructionList il, InstructionList functions){
 		instructionLists = new ArrayList<InstructionList>();
 		instructionLists.add(il);
+		instructionLists.add(functions);
 	}
 
 	public void add(InstructionList il) {

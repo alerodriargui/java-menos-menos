@@ -48,4 +48,8 @@ begin
 	print("enter int, I will print it");
 	print(readint);
 end
-endfunc
+
+
+
+
+

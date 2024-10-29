@@ -95,6 +95,7 @@ non terminal Condition str_rel;
 non terminal SimpleInstruction instruction;
 non terminal SimpleInstruction simple_instr;
 non terminal InstructionList instructions;
+non terminal InstructionList functions;
 
 non terminal SimpleInstruction assign_stat;
 non terminal SimpleInstruction if_stat;
@@ -391,9 +392,14 @@ output_stat ::= PRINT LPAREN expr:e RPAREN               {: RESULT = new OutputI
 fileoutput_stat ::= FILEOUT LPAREN expr:s COMMA expr:s2 RPAREN    {: RESULT = new FileOutputInstruction(s, s2); :}
             ;
 
-main_instr ::= FUNC MAIN BEGIN instructions:i END ENDFUNC
+functions ::= FUNC BEGIN instructions:si END          {: RESULT = si; :}
+                |                                     {:  :}
+            ;
+
+
+main_instr ::= FUNC MAIN BEGIN instructions:i END functions:f 
             {:
-                RESULT = new MainInstructionList(i);  
+                RESULT = new MainInstructionList(i, f);  
             :}
             ;
 
