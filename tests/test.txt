@@ -49,6 +49,12 @@ begin
 	print(readint);
 end
 
+func
+begin
+	integer funs := 3333;
+	print(funs);
+end
+
 
 
 

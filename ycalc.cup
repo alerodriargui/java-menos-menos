@@ -391,9 +391,13 @@ output_stat ::= PRINT LPAREN expr:e RPAREN               {: RESULT = new OutputI
 
 fileoutput_stat ::= FILEOUT LPAREN expr:s COMMA expr:s2 RPAREN    {: RESULT = new FileOutputInstruction(s, s2); :}
             ;
-
-functions ::= FUNC BEGIN instructions:si END          {: RESULT = si; :}
-                |                                     {:  :}
+functions ::= FUNC BEGIN instructions:si END 
+            {:
+                RESULT = si;
+            :}
+            |                          
+            {:
+            :}
             ;
 
 
