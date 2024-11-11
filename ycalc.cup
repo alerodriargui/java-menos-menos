@@ -107,6 +107,9 @@ non terminal SimpleInstruction begin_end_instr;
 non terminal SimpleInstruction function_call;
 non terminal Main program;
 non terminal MainInstructionList main_instr;
+non terminal List<String> params;
+non terminal List<Object> args;
+
 
 /** Precedence */
 precedence left PLUS, MINUS;
@@ -284,7 +287,7 @@ assign_stat ::= INTEGER IDENT:i ASSIGN num_expr:e          {:
             type = SymbolType.OTHER;
         }       
         // Añadir el símbolo a la tabla
-        symbolTable.put(i, e, type, false);
+        symbolTable.put(i, e, type, false, null);
 
         RESULT = new AssignInstruction(i, e); 
     :}
@@ -298,7 +301,7 @@ assign_stat ::= INTEGER IDENT:i ASSIGN num_expr:e          {:
             type = SymbolType.OTHER;
         }
         // Añadir el símbolo a la tabla
-        symbolTable.put(i.toString(), e, type, false);
+        symbolTable.put(i.toString(), e, type, false, null);
 
         RESULT = new AssignInstruction(i, e); 
 
@@ -313,7 +316,7 @@ assign_stat ::= INTEGER IDENT:i ASSIGN num_expr:e          {:
             type = SymbolType.OTHER;
         }
         // Añadir el símbolo a la tabla
-        symbolTable.put(i.toString(), e, type, false);
+        symbolTable.put(i.toString(), e, type, false, null);
         
         RESULT = new AssignInstruction(i, e);
     :}
@@ -337,7 +340,7 @@ assign_stat ::= INTEGER IDENT:i ASSIGN num_expr:e          {:
                 type = SymbolType.OTHER;
             }
 
-            symbolTable.put(i.toString(), e, type, true);
+            symbolTable.put(i.toString(), e, type, true, null);
         }
         RESULT = new AssignInstruction(i, e);
 
@@ -372,11 +375,11 @@ assign_stat ::= INTEGER IDENT:i ASSIGN num_expr:e          {:
             report_fatal_error("Type mismatch: cannot assign a value of type " + type + " to variable " + i + " of type " + symbol.getType() + ".", symbol);
             return null;
         }
-        symbolTable.put(i,e,type,false);
+        symbolTable.put(i,e,type,false, null);
         // Si el tipo coincide y no es constante, se permite la reasignación
     } else {
         // Si el símbolo no existe, agregarlo a la tabla de símbolos
-        symbolTable.put(i, e, type, false);
+        symbolTable.put(i, e, type, false, null);
     }
 
         RESULT = new AssignInstruction(i, e);
@@ -397,10 +400,12 @@ output_stat ::= PRINT LPAREN expr:e RPAREN               {: RESULT = new OutputI
 fileoutput_stat ::= FILEOUT LPAREN expr:s COMMA expr:s2 RPAREN    {: RESULT = new FileOutputInstruction(s, s2); :}
             ;
 
-functions ::= FUNC2 IDENT:i BEGIN instructions:si ENDFUNC2 
+functions ::= FUNC2 IDENT:i LPAREN params:p RPAREN BEGIN instructions:si ENDFUNC2 
             {:
-            Symbol functionSymbol = new Symbol(i, si, SymbolType.FUNCTION, false);
+            Symbol functionSymbol = new Symbol(i, si, SymbolType.FUNCTION, false, p);
+            functionSymbol.setParams(p);  // Guardamos los parámetros
             symbolTable.put(functionSymbol);
+            
             RESULT = si;
             :}
             |                          
@@ -408,13 +413,58 @@ functions ::= FUNC2 IDENT:i BEGIN instructions:si ENDFUNC2
             :}
             ;
 
-function_call ::= IDENT:i LPAREN RPAREN
+params ::= IDENT:param COMMA params:p
+          {:
+            List<String> paramList = new ArrayList<>();
+            paramList.add(param);  // Añadir el primer parámetro
+            paramList.addAll(p);   // Añadir el resto de los parámetros
+            RESULT = paramList;
+          :}
+          | IDENT:param
+          {:
+            List<String> paramList = new ArrayList<>();
+            paramList.add(param);  // Sólo un parámetro
+            RESULT = paramList;
+          :}
+          ;
+    
+
+function_call ::= IDENT:i LPAREN args:a RPAREN
             {:
-                RESULT = new FunctionCallInstruction(i);
+                RESULT = new FunctionCallInstruction(i, a);  // Pasamos los parámetros a la función
             :}
-            
             ;
 
+args ::= expr:e COMMA args:a
+       {:
+         List<Object> arguments = new ArrayList<>();
+         // Aquí asumimos que e tiene un método que devuelve su valor real
+         if (e instanceof IntExpression) {
+             arguments.add(((IntExpression)e).getValue());  // Accede al valor real del entero
+         } else if (e instanceof BoolExpression2) {
+             arguments.add(((BoolExpression2)e).getValue());  // Accede al valor real del booleano
+         } else {
+             arguments.add(e);  // Si no es una expresión conocida, se añade tal cual
+         }
+         arguments.addAll(a);  // Añadir los parámetros adicionales (también procesados de la misma forma)
+         RESULT = arguments;
+       :}
+       | expr:e
+       {:
+         List<Object> arguments = new ArrayList<>();
+         // Aquí también evaluamos el valor directamente
+         if (e instanceof IntExpression) {
+             arguments.add(((IntExpression)e).getValue());  // Valor real del entero
+         } else if (e instanceof BoolExpression2) {
+             arguments.add(((BoolExpression2)e).getValue());  // Valor real del booleano
+         } else {
+             arguments.add(e);  // Si no es una expresión conocida, se añade tal cual
+         }
+         RESULT = arguments;
+       :}
+;
+
+   
 
 main_instr ::= functions MAIN BEGIN instructions:i END
             {:

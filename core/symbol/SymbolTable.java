@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 
 public class SymbolTable {
     private static SymbolTable instance = null;
@@ -32,8 +33,8 @@ public class SymbolTable {
     }
 
     // Sobrecarga para facilidad de uso al añadir símbolos
-    public void put(String name, Object value, SymbolType type, boolean isConstant) {
-        Symbol symbol = new Symbol(name, value, type, isConstant);
+    public void put(String name, Object value, SymbolType type, boolean isConstant, List<String> params) {
+        Symbol symbol = new Symbol(name, value, type, isConstant, params);
         if(isConstant){
             //System.out.println("Constante: " + name + " = " + value);
         }

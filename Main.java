@@ -241,16 +241,18 @@ class AssignInstruction implements SimpleInstruction
 
 class FunctionCallInstruction implements SimpleInstruction {
     private String functionName;
+    private List<Object> arguments; // Argumentos para la llamada
 
-    public FunctionCallInstruction(String functionName) {
+    public FunctionCallInstruction(String functionName, List<Object> arguments) {
         this.functionName = functionName;
+        this.arguments = arguments;
     }
 
     @Override
     public void run(HashMap<String, Object> hm) {
         // Acceder a la tabla de símbolos global
         SymbolTable symbolTable = SymbolTable.getInstance();
-        
+
         if (symbolTable == null) {
             System.err.println("SymbolTable not found.");
             return;
@@ -263,11 +265,28 @@ class FunctionCallInstruction implements SimpleInstruction {
             return;
         }
 
+        // Obtener la lista de parámetros de la función
+        List<String> params = functionSymbol.getParams();
+        if (params.size() != arguments.size()) {
+            System.err.println("Argument count mismatch for function: " + functionName);
+            return;
+        }
+
+        // Crear un nuevo contexto de ejecución para esta función
+        HashMap<String, Object> localContext = new HashMap<>(hm);
+
+        // Asignar los valores de los parámetros a las variables locales
+        for (int i = 0; i < params.size(); i++) {
+            localContext.put(params.get(i), arguments.get(i));
+        }
+
         // Ejecutar las instrucciones de la función
         InstructionList functionInstructions = (InstructionList) functionSymbol.getValue();
-        functionInstructions.run(hm);
+        functionInstructions.run(localContext);
     }
 }
+
+
 
 
 
@@ -429,6 +448,10 @@ class IntExpression implements Expr
 	{
 		value = e;
 	}
+
+	public int getValue() {
+        return value;
+    }
 
 	public Object run(HashMap<String, Object> hm)
 	{
@@ -687,6 +710,10 @@ class BoolExpression2 implements Expr{
 	{
 		value = e;
 	}
+
+	public boolean getValue() {
+        return value;
+    }
 
 	public Object run(HashMap<String, Object> hm)
 	{

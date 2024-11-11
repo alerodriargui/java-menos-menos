@@ -1,7 +1,7 @@
-function hola
+function hola (fa, fb)
 begin
-	integer funs := 3333;
-	print(funs);
+	integer fst := fa - fb;
+	print(fst);
 endfunction
 
 main
@@ -53,7 +53,7 @@ begin
 	print("enter int, I will print it");
 	print(readint);
 
-	hola();
+	hola(155, 10);
 end
 
 
