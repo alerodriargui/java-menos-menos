@@ -3,8 +3,10 @@ s3 (OTHER): ConcatStringExpression@179d3b25
 a (INTEGER): IntExpression@254989ff
 b (INTEGER): IntExpression@5d099f62
 c (OTHER): PreDecrementExpression@37f8bb67
-d (BOOLEAN): BoolExpression2@49c2faae
-e (TUPLE): TupleExpression@20ad9418
+funs (INTEGER): IntExpression@49c2faae
+d (BOOLEAN): BoolExpression2@20ad9418
+e (TUPLE): TupleExpression@31cefde0
 tester (CONSTANT): true
-s1 (STRING): StringExpression@31cefde0
-s2 (STRING): StringExpression@439f5b3d
+hola (FUNCTION): InstructionList@439f5b3d
+s1 (STRING): StringExpression@1d56ce6a
+s2 (STRING): StringExpression@5197848c

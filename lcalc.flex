@@ -75,6 +75,9 @@ STRING = \"([^\\\"]|\\.)*\"
     "tup"             { return symbol(sym.TUP); }
 
     "func"            { return symbol(sym.FUNC); }
+    "function"            { return symbol(sym.FUNC2); }
+    "endfunction"       { return symbol(sym.ENDFUNC2); }
+
     "endfunc"         { return symbol(sym.ENDFUNC); } 
     "main"            { return symbol(sym.MAIN); }  
 

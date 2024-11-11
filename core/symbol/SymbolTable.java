@@ -6,8 +6,17 @@ import java.io.IOException;
 import java.util.HashMap;
 
 public class SymbolTable {
-    private HashMap<String, Symbol> symbols = new HashMap<>();
+    private static SymbolTable instance = null;
 
+    private HashMap<String, Symbol> symbols = new HashMap<>();
+    private SymbolTable() {}  // Constructor privado para evitar instanciación externa
+
+    public static SymbolTable getInstance() {
+        if (instance == null) {
+            instance = new SymbolTable();
+        }
+        return instance;
+    }
     // Método para añadir un símbolo completo
     public void put(Symbol symbol) {
         // Check if the symbol already exists and is a constant
@@ -67,5 +76,8 @@ public class SymbolTable {
         }
     }
 
-    
+    // Devuelve una instancia de SymbolTable
+    public HashMap<String, Symbol> getSymbols() {
+        return this.symbols;
+    }
 }

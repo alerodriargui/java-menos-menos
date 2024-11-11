@@ -5,12 +5,12 @@ import core.all.Tuple;
 import core.intermediate.TresDirCode;
 import core.intermediate.Assembly;
 import java.nio.charset.StandardCharsets;
+import core.symbol.Symbol;
 
 import core.symbol.SymbolType;
 import java_cup.runtime.ComplexSymbolFactory;
 import java_cup.runtime.ComplexSymbolFactory.ComplexSymbol;
 import java_cup.runtime.SymbolFactory;
-import java.util.Arrays;
 
 
 
@@ -18,16 +18,17 @@ interface Expr { Object run(HashMap<String, Object> hm); }
 interface Condition { boolean test(Expr e1, Expr e2, HashMap<String, Object> hm); }
 interface Operator { int count(Expr e1, Expr e2, HashMap<String, Object> hm); }
 
+
 interface SimpleInstruction { void run(HashMap<String,Object> hm); }
 
 interface WhileInstructionI extends SimpleInstruction {void run(HashMap<String, Object> hm); }
 interface IfInstructionI extends SimpleInstruction {void run(HashMap<String, Object> hm); }
+
    
 public class Main {
 
 	private HashMap<String, Object> hm = new HashMap<>();
 	private MainInstructionList instructionList;
-
 	public Main(MainInstructionList instructionList)
 	{
 		this.instructionList = instructionList;
@@ -49,13 +50,12 @@ public class Main {
 
 			parser p = new parser(l, sf);
 			Object result = p.parse().value;
-			
+
 			// Guardar los tokens en un archivo
 			saveTokensFile(l.tokens);
 
 			// Guardar la tabla de símbolos en un archivo
 			saveSymbolTableFile(p.getSymbolTable());
-			
 			//Back-end
 			TresDirCode tresDirCode = new TresDirCode();
 			Assembly assembly = new Assembly(tresDirCode, p.getSymbolTable());
@@ -238,6 +238,37 @@ class AssignInstruction implements SimpleInstruction
 			hm.put(name, val.run(hm));
 	}
 }
+
+class FunctionCallInstruction implements SimpleInstruction {
+    private String functionName;
+
+    public FunctionCallInstruction(String functionName) {
+        this.functionName = functionName;
+    }
+
+    @Override
+    public void run(HashMap<String, Object> hm) {
+        // Acceder a la tabla de símbolos global
+        SymbolTable symbolTable = SymbolTable.getInstance();
+        
+        if (symbolTable == null) {
+            System.err.println("SymbolTable not found.");
+            return;
+        }
+
+        // Buscar la función en la tabla de símbolos
+        Symbol functionSymbol = symbolTable.get(functionName);
+        if (functionSymbol == null) {
+            System.err.println("Function " + functionName + " not found.");
+            return;
+        }
+
+        // Ejecutar las instrucciones de la función
+        InstructionList functionInstructions = (InstructionList) functionSymbol.getValue();
+        functionInstructions.run(hm);
+    }
+}
+
 
 
 /** OPERATORS */
@@ -910,10 +941,9 @@ class MainInstructionList
 {
 	private List<InstructionList> instructionLists;
 
-	public MainInstructionList(InstructionList il, InstructionList functions){
+	public MainInstructionList(InstructionList il){
 		instructionLists = new ArrayList<InstructionList>();
 		instructionLists.add(il);
-		instructionLists.add(functions);
 	}
 
 	public void add(InstructionList il) {

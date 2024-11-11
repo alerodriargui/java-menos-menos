@@ -1,4 +1,10 @@
-func main
+function hola
+begin
+	integer funs := 3333;
+	print(funs);
+endfunction
+
+main
 begin
 	integer a := 1;
 	integer b := 2;
@@ -35,7 +41,6 @@ begin
 	s2 := "dsa";
 	s3 := concatenate(s1, s2);
 	print(s3);
-
 	$probando comentario de linea
 
 	fileout("FILETEST.txt", s3);
@@ -44,15 +49,11 @@ begin
 	print(position(s3, s2));
 	print("enter string, I will print it");
 	print(readstr);
-
+	
 	print("enter int, I will print it");
 	print(readint);
-end
 
-func
-begin
-	integer funs := 3333;
-	print(funs);
+	hola();
 end
 
 

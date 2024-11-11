@@ -8,8 +8,7 @@ import core.symbol.Symbol;
 parser code {:
 
 
-    private SymbolTable symbolTable = new SymbolTable();
-
+    private SymbolTable symbolTable = SymbolTable.getInstance();
     public SymbolTable getSymbolTable() {
         return symbolTable;
     }
@@ -74,6 +73,8 @@ terminal           TUP;
 
 terminal           FUNC;
 terminal           ENDFUNC;
+terminal           FUNC2;
+terminal           ENDFUNC2;
 terminal           MAIN;
 
 
@@ -103,6 +104,7 @@ non terminal SimpleInstruction while_stat;
 non terminal SimpleInstruction output_stat;
 non terminal SimpleInstruction fileoutput_stat;
 non terminal SimpleInstruction begin_end_instr;
+non terminal SimpleInstruction function_call;
 non terminal Main program;
 non terminal MainInstructionList main_instr;
 
@@ -264,11 +266,14 @@ simple_instr ::= assign_stat:si SEMI                  {: RESULT = si; :}
 instruction ::= if_stat:si                      {: RESULT = si; :}
                 | while_stat:si                   {: RESULT = si; :}
                 | simple_instr:si               {: RESULT = si; :}
+                | function_call:fc SEMI             {: RESULT = fc; :}¡
+
                 ;
 
 instructions ::= instructions:i instruction:si           {: i.add(si); RESULT = i; :}
         | instruction:si                        {: RESULT = new InstructionList(si); :}
         ;
+
 
 assign_stat ::= INTEGER IDENT:i ASSIGN num_expr:e          {: 
         // Aquí obtenemos el tipo del símbolo basado en la expresión
@@ -391,19 +396,30 @@ output_stat ::= PRINT LPAREN expr:e RPAREN               {: RESULT = new OutputI
 
 fileoutput_stat ::= FILEOUT LPAREN expr:s COMMA expr:s2 RPAREN    {: RESULT = new FileOutputInstruction(s, s2); :}
             ;
-functions ::= FUNC BEGIN instructions:si END 
+
+functions ::= FUNC2 IDENT:i BEGIN instructions:si ENDFUNC2 
             {:
-                RESULT = si;
+            Symbol functionSymbol = new Symbol(i, si, SymbolType.FUNCTION, false);
+            symbolTable.put(functionSymbol);
+            RESULT = si;
             :}
             |                          
             {:
             :}
             ;
 
-
-main_instr ::= FUNC MAIN BEGIN instructions:i END functions:f 
+function_call ::= IDENT:i LPAREN RPAREN
             {:
-                RESULT = new MainInstructionList(i, f);  
+                RESULT = new FunctionCallInstruction(i);
+            :}
+            
+            ;
+
+
+main_instr ::= functions MAIN BEGIN instructions:i END
+            {:
+                MainInstructionList mainInstructions = new MainInstructionList(i);  
+                RESULT = mainInstructions;
             :}
             ;
 
