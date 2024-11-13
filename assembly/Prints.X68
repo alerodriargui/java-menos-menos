@@ -115,6 +115,171 @@ READ_BOOL:
     MOVE.W  (A7)+, D0        ; Restore D0 from stack
     RTS                      ; Return from subroutine
 
+;---------------------------------------------------------------------
+; *** OPERATORS ***
+;---------------------------------------------------------------------
+
+; ----------------------------------------------------------------------------- 
+; ADD_INT - SUMS TWO INTEGERS
+; INPUT: D2, D3 (bynow) - INTEFER TO ADD
+; OUTPUT: D1 (bynow) - INTEGER 
+; ----------------------------------------------------------------------------- 
+
+ADD_INT
+    MOVE.W  D0,-(A7)        ; Save D0 Stack
+    MOVE.W  D2,D0           
+    MOVE.W  D3,D1
+    ADD.W   D0,D1           ; Sum into D1
+    MOVE.W  (A7)+, D0
+    RTS    
+    
+    
+; ----------------------------------------------------------------------------- 
+; SUB_INT - SUBSTRACTS TWO INTEGERS
+; INPUT: D2, D3 (bynow) - INTEFER TO ADD
+; OUTPUT: D1 (bynow) - INTEGER 
+; ----------------------------------------------------------------------------- 
+
+SUB_INT
+    MOVE.W  D0,-(A7)        ; Save D0 Stack
+    MOVE.W  D2,D0           
+    MOVE.W  D3,D1
+    SUB.W   D0,D1           ; Sum into D1
+    MOVE.W  (A7)+, D0
+    RTS    
+
+; ----------------------------------------------------------------------------- 
+; MULT_INT - MULTIPLIES AN INTEGER BY ANOTHER
+; INPUT: D2, D3 (bynow) - INTEFER TO ADD
+; OUTPUT: D1 (bynow) - INTEGER 
+; ----------------------------------------------------------------------------- 
+
+MULT_INT
+    MOVE.W  D0,-(A7)        ; Save D0 Stack
+    MOVE.W  D2,D0           
+    EXT.L   DO              ; Long and signed
+    MOVE.W  D3,D1
+    EXT.L   D1
+    MULS.W  D0,D1           ; Multiplication into D1
+    MOVE.W  (A7)+, D0
+    RTS    
+    
+    
+; ----------------------------------------------------------------------------- 
+; DIV_INT - DIVIDES AN INTEGER BY ANOTHER
+; INPUT: D2, D3 (bynow) - INTEFER TO ADD
+; OUTPUT: D1 (bynow) - INTEGER 
+; ----------------------------------------------------------------------------- 
+
+DIV_INT
+    MOVE.W  D0,-(A7)        ; Save D0 Stack
+    MOVE.W  D2,D0           
+    EXT.L   DO              ; Long and signed
+    MOVE.W  D3,D1
+    EXT.L   D1
+    DIVS.W  D0,D1           ; Division into D1, second word is residue
+    MOVE.W  (A7)+, D0
+    RTS    
+
+
+;---------------------------------------------------------------------
+; *** CONDITIONALS ***
+;--------------------------------------------------------------------
+
+; ----------------------------------------------------------------------------- 
+; AND - AND INSTRUCTION
+; INPUT: D2, D3 (bynow) - INTEFER TO ADD
+; OUTPUT: D1 (bynow) - INTEGER 
+; ---------------------------------------------------------------------------------
+
+AND_INT
+    MOVE.W  D0,-(A7)        ; Save D0 Stack
+    MOVE.W  D2,D0           
+    MOVE.W  D3,D1
+    AND.W   D0,D1           ; Sum into D1
+    MOVE.W  (A7)+, D0
+    RTS  
+    
+; ----------------------------------------------------------------------------- 
+; OR - OR INSTRUCTION
+; INPUT: D2, D3 (bynow) - INTEFER TO ADD
+; OUTPUT: D1 (bynow) - INTEGER 
+; ---------------------------------------------------------------------------------
+
+OR_INT
+    MOVE.W  D0,-(A7)        ; Save D0 Stack
+    MOVE.W  D2,D0           
+    MOVE.W  D3,D1
+    OR.W    D0,D1           ; Sum into D1
+    MOVE.W  (A7)+, D0
+    RTS 
+
+;---------------------------------------------------------------------
+; *** COMPARATORS ***
+;----------------------------------------------------------------------
+
+; ----------------------------------------------------------------------------- 
+; EQUAL - EQUAL COMPARISION
+; INPUT: D2, D3 (bynow) - INTEFER TO ADD
+; OUTPUT: D1 (bynow) - INTEGER 
+; ---------------------------------------------------------------------------------
+
+EQUAL_INT
+    MOVE.W  D0,-(A7)        ; Save D0 Stack
+    MOVE.W  D2,D0           
+    CMP.W   D3,D0           ; Compare D0 with D3 
+    SEQ     D1              ; Set D1 if equal
+    AND.W   #1,D1           ; Mask to ensure only bit 0 is set
+    MOVE.W  (A7)+, D0
+
+    RTS
+
+; ----------------------------------------------------------------------------- 
+; LESS - LESS COMPARISION
+; INPUT: D2, D3 (bynow) - INTEFER TO ADD
+; OUTPUT: D1 (bynow) - INTEGER 
+; ---------------------------------------------------------------------------------
+
+LESS_INT
+    MOVE.W  D0,-(A7)        ; Save D0 Stack
+    MOVE.W  D2,D0           
+    CMP.W   D3,D0           ; Compare D0 with D3
+    SLT     D1              ; Set D1 if less than
+    AND.W   #1,D1           ; Mask to ensure only bit 0 is set
+    MOVE.W  (A7)+, D0
+    RTS
+    
+; ----------------------------------------------------------------------------- 
+; GREATER - GREATER COMPARISION
+; INPUT: D2, D3 (bynow) - INTEFER TO ADD
+; OUTPUT: D1 (bynow) - INTEGER 
+; ---------------------------------------------------------------------------------
+
+GREATER_INT
+    MOVE.W  D0,-(A7)        ; Save D0 Stack
+    MOVE.W  D2,D0           
+    CMP.W   D3,D0           ; Compare D0 with D3
+    SGT     D1              ; Set D1 if greater than
+    AND.W   #1,D1           ; Mask to ensure only bit 0 is set
+    MOVE.W  (A7)+, D0
+    RTS
+    
+; ----------------------------------------------------------------------------- 
+; IF - IF OPERATOR -- IF(true) por ejemplo
+; INPUT: D2 (bynow) - condition
+; OUTPUT: D1 (bynow) - INTEGER 
+; ---------------------------------------------------------------------------------
+
+IF_INT
+    MOVE.W  D0,-(A7)        ; Save D0 Stack
+    MOVE.W  D2,D0           
+    MOVE.W  D3,D1
+    CMP.W   D0, D1
+    
+    BEQ     D0
+    MOVE.W  D0, D1
+    MOVE.W  (A7)+, D0
+    RTS
 
 ;---------------------------------------------------------------------
 ;TEST VARS
@@ -124,6 +289,7 @@ teststring DC.B 'JACINTO test',0   ; test string
                
 
     END     START          ; End of program, define start point
+
 
 
 
