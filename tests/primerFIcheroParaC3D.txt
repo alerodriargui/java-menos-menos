@@ -1,0 +1,4 @@
+main
+begin
+	integer a := 1;
+end

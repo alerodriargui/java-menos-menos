@@ -6,9 +6,18 @@ import core.symbol.SymbolType;
 import core.symbol.Symbol;
 
 parser code {:
-
-
+    private Lexer scanner;
+    private c3Direcciones c3d;
     private SymbolTable symbolTable = SymbolTable.getInstance();
+
+    public parser(Lexer scanner, SymbolFactory sf){
+      super(scanner, sf);
+      this.scanner = scanner;
+      this.c3d = new c3Direcciones();
+      c3d.printInstructions();
+    }
+
+
     public SymbolTable getSymbolTable() {
         return symbolTable;
     }
@@ -139,10 +148,19 @@ num_op ::= PLUS             {: RESULT = new PlusOperator(); :}
     Pueden ser: un ID, un numero, un booleano (true o false) o una tupla
 */
 expr ::= IDENT:i            {: RESULT = new ID(i); :}
-            |num_expr:e     {: RESULT = e; :}
-            |str_expr:e     {: RESULT = e; :}
-            |bool_expr:e    {: RESULT = e; :} 
-            |tuple_expr:e          {: RESULT = e; :} 
+            |num_expr:e     {: e.generateCode(c3d);
+                                RESULT = e;
+                                            :}
+            |str_expr:e     {: e.generateCode(c3d);
+                                RESULT = e;
+                                 :}
+            |bool_expr:e    {: e.generateCode(c3d);
+                                RESULT = e;
+                                :}
+            |tuple_expr:e          {:
+                                        e.generateCode(c3d);
+                                        RESULT = e;
+                                    :}
             ;
 
 //Tupla
@@ -475,6 +493,7 @@ main_instr ::= functions MAIN BEGIN instructions:i END
 
 program ::= main_instr:i
           {:
+            c3d.printInstructions();
             RESULT = new Main(i);  // Devuelve una instancia de Main
           :}
           ;
