@@ -14,7 +14,7 @@ import java_cup.runtime.SymbolFactory;
 
 
 
-interface Expr { Object run(HashMap<String, Object> hm); }
+interface Expr { Object run(HashMap<String, Object> hm); String generateCode(c3Direcciones codeGen);}
 interface Condition { boolean test(Expr e1, Expr e2, HashMap<String, Object> hm); }
 interface Operator { int count(Expr e1, Expr e2, HashMap<String, Object> hm); }
 
@@ -144,6 +144,24 @@ class TupleExpression implements Expr {
         
         return new Tuple(Arrays.asList(value1, value2)); // Crea una lista de los valores
     }
+
+	@Override
+	public String generateCode(c3Direcciones codeGen) {
+		// Genera el código intermedio para las dos expresiones
+		String temp1 = e1.generateCode(codeGen);
+		String temp2 = e2.generateCode(codeGen);
+
+		// Crear un temporal para la tupla
+		String tupleTemp = codeGen.newTemp();
+
+		// Generar la instrucción que define la tupla
+		codeGen.addInstruction("TUPLE", temp1, temp2, tupleTemp);
+
+		// Retornar el temporal que contiene la tupla
+		return tupleTemp;
+	}
+
+
 }
 
 class ConstIntExpression extends IntExpression {
@@ -220,6 +238,10 @@ class ID implements Expr
 	{
 		return hm.get(name);
 	}
+
+	public String generateCode(c3Direcciones codeGen) {
+		return name;  // El nombre de la variable es el código intermedio en este caso.
+	}
 }
 
 class AssignInstruction implements SimpleInstruction
@@ -237,6 +259,11 @@ class AssignInstruction implements SimpleInstruction
 	{
 			hm.put(name, val.run(hm));
 	}
+
+	public void generateCode(TresDirCode codeGen) {
+		String result = name;
+	}
+
 }
 
 class FunctionCallInstruction implements SimpleInstruction {
@@ -397,6 +424,27 @@ class PreIncrementExpression implements Expr {
 		}
 	}
 
+	@Override
+	public String generateCode(c3Direcciones codeGen) {
+		// Generamos un nuevo temporal para la expresión
+		String temp = codeGen.newTemp();
+
+		// Obtenemos el código intermedio de la expresión e
+		String exprCode = e.generateCode(codeGen);
+
+		// Cargamos el valor de la expresión en el temporal
+		codeGen.addInstruction("LOAD", exprCode, "", temp);  // Cargamos el valor en un temporal
+
+		// Incrementamos el valor del temporal
+		String incrementedTemp = codeGen.newTemp();
+		codeGen.addInstruction("ADD", temp, "1", incrementedTemp);  // Incremento de 1
+
+		// Almacenamos el valor incrementado de vuelta en la variable o temporal
+		codeGen.addInstruction("STORE", incrementedTemp, "", exprCode);  // Guardamos el nuevo valor
+
+		return exprCode;  // Retornamos el nombre de la variable o temporal actualizado
+	}
+
 
 }
 
@@ -419,6 +467,28 @@ class PreDecrementExpression implements Expr {
 			return 0;
 		}
 	}
+
+	@Override
+	public String generateCode(c3Direcciones codeGen) {
+		// Generamos un nuevo temporal para la expresión
+		String temp = codeGen.newTemp();
+
+		// Obtenemos el código intermedio de la expresión e
+		String exprCode = e.generateCode(codeGen);
+
+		// Cargamos el valor de la expresión en el temporal
+		codeGen.addInstruction("LOAD", exprCode, "", temp);  // Cargamos el valor en un temporal
+
+		// Decrementamos el valor del temporal
+		String decrementedTemp = codeGen.newTemp();
+		codeGen.addInstruction("SUB", temp, "1", decrementedTemp);  // Decremento de 1
+
+		// Almacenamos el valor decrementado de vuelta en la variable o temporal
+		codeGen.addInstruction("STORE", decrementedTemp, "", exprCode);  // Guardamos el nuevo valor
+
+		return exprCode;  // Retornamos el nombre de la variable o temporal actualizado
+	}
+
 }
 
 class OperatorExpression implements Expr {
@@ -437,6 +507,28 @@ class OperatorExpression implements Expr {
 	{
 		return o.count(e, e2, hm);
 	}
+
+	@Override
+	public String generateCode(c3Direcciones codeGen) {
+		// Generar código para la primera expresión
+		String temp1 = e.generateCode(codeGen);  // Código para la primera expresión
+		// Generar código para la segunda expresión
+		String temp2 = e2.generateCode(codeGen);  // Código para la segunda expresión
+
+		// Crear un nuevo temporal para almacenar el resultado de la operación
+		String resultTemp = codeGen.newTemp();
+
+		// Dependiendo del operador, generar el código intermedio
+		// Aquí, usamos el operador que tiene el objeto 'o'. Puede ser suma, resta, multiplicación, etc.
+		String operatorCode = o.toString(); // Aquí, asumiendo que 'Operator' tiene un método 'getOperatorCode()'
+
+		// Añadir la instrucción correspondiente para realizar la operación
+		codeGen.addInstruction(operatorCode, temp1, temp2, resultTemp);
+
+		// Retornar el temporal que contiene el resultado
+		return resultTemp;
+	}
+
 }
 
 /** INT OPERATIONS */
@@ -457,6 +549,20 @@ class IntExpression implements Expr
 	{
 		return value;
 	}
+
+	@Override
+	public String generateCode(c3Direcciones codeGen) {
+		// Crear un nuevo temporal para almacenar el valor de la expresión
+		String resultTemp = codeGen.newTemp();
+
+		// Generar la instrucción de asignación
+		// Asignar el valor entero directamente al temporal
+		codeGen.addInstruction("ASSIGN", Integer.toString(value), "", resultTemp);
+
+		// Retornar el temporal que contiene el valor del entero
+		return resultTemp;
+	}
+
 }
 
 class IntEnterExpression implements Expr
@@ -466,6 +572,19 @@ class IntEnterExpression implements Expr
 		java.util.Scanner in = new java.util.Scanner(System.in);
 		return in.nextInt();
 	}
+
+	public String generateCode(c3Direcciones codeGen) {
+		// Crear un nuevo temporal para almacenar el valor leído
+		String resultTemp = codeGen.newTemp();
+
+		// Generar la instrucción que simula leer un entero desde la entrada
+		// Supongamos que la operación de entrada se representa como "READ" en el código intermedio
+		codeGen.addInstruction("READ", "", "", resultTemp);
+
+		// Retornar el temporal que contiene el valor leído
+		return resultTemp;
+	}
+
 }
 
 class PIntExpression implements Expr
@@ -480,6 +599,12 @@ class PIntExpression implements Expr
 	public Object run(HashMap<String, Object> hm)
 	{
 		return expr.run(hm);
+	}
+
+	@Override
+	public String generateCode(c3Direcciones codeGen) {
+		// Llamamos al generateCode de la expresión interna (expr) para generar el código intermedio
+		return expr.generateCode(codeGen);
 	}
 }
 
@@ -503,6 +628,20 @@ class UMinusExpression implements Expr
 		}
 	}
 
+	@Override
+	public String generateCode(c3Direcciones codeGen) {
+		// Primero generamos el código para la expresión interna (e)
+		String temp = e.generateCode(codeGen); // Aquí obtenemos el código intermedio de e
+
+		// Crear un nuevo nombre para el temporal donde se almacenará el resultado de la operación unaria
+		String tempResult = codeGen.newTemp();
+
+		// Agregar la instrucción de código intermedio para la operación de negación
+		codeGen.addInstruction("-", temp, null, tempResult);
+
+		return tempResult;  // Retornamos el nombre del temporal donde se almacena el resultado
+	}
+
 }
 
 class STRLengthExpression implements Expr
@@ -524,6 +663,21 @@ class STRLengthExpression implements Expr
 			return 0;
 		}
 
+	}
+
+	@Override
+	public String generateCode(c3Direcciones codeGen) {
+		// Generamos el código para la expresión interna
+		String temp = e.generateCode(codeGen);
+
+		// Creamos un nuevo temporal para almacenar el resultado
+		String tempResult = codeGen.newTemp();
+
+		// Agregamos la instrucción para obtener la longitud de la cadena
+		codeGen.addInstruction("strlen", temp, null, tempResult);
+
+		// Retornamos el temporal con el resultado
+		return tempResult;
 	}
 
 }
@@ -553,6 +707,23 @@ class STRPositionExpression implements Expr
 			System.exit(1);
 			return 0;
 		}
+	}
+
+
+	@Override
+	public String generateCode(c3Direcciones codeGen) {
+		// Generamos el código para las expresiones internas
+		String temp1 = e.generateCode(codeGen);  // Temporal para la cadena principal
+		String temp2 = e2.generateCode(codeGen); // Temporal para la subcadena
+
+		// Creamos un temporal para almacenar el resultado
+		String tempResult = codeGen.newTemp();
+
+		// Agregamos la instrucción para buscar la posición de la subcadena
+		codeGen.addInstruction("strpos", temp1, temp2, tempResult);
+
+		// Retornamos el temporal con el resultado
+		return tempResult;
 	}
 
 }
@@ -719,6 +890,18 @@ class BoolExpression2 implements Expr{
 	{
 		return value;
 	}
+
+	@Override
+	public String generateCode(c3Direcciones codeGen) {
+		// Creamos un temporal para almacenar el valor booleano
+		String tempResult = codeGen.newTemp();
+
+		// Agregamos la instrucción para asignar el valor booleano al temporal
+		codeGen.addInstruction("assign", value.toString(), null, tempResult);
+
+		// Retornamos el temporal que contiene el valor booleano
+		return tempResult;
+	}
 }
 
 
@@ -752,6 +935,27 @@ class BooleanExpression implements Expr
 	{
 		return value;
 	}
+
+	@Override
+	public String generateCode(c3Direcciones codeGen) {
+		// Crear un temporal para almacenar el valor booleano
+		String tempResult = codeGen.newTemp();
+
+		// Determinar si el valor es una constante
+		String boolValue = value != null ? value.toString() : "null";
+
+		if (isConst) {
+			// Agregar instrucción de asignación como constante
+			codeGen.addInstruction("assign_const", boolValue, null, tempResult);
+		} else {
+			// Agregar instrucción de asignación regular
+			codeGen.addInstruction("assign", boolValue, null, tempResult);
+		}
+
+		// Retornar el temporal que contiene el valor booleano
+		return tempResult;
+	}
+
 }
 
 class ConditionBooleanExpression implements Expr{
@@ -770,6 +974,26 @@ class ConditionBooleanExpression implements Expr{
 	{
 		return c.test(e, e2, hm);
 	}
+
+	@Override
+	public String generateCode(c3Direcciones codeGen) {
+		// Generar código para las expresiones e y e2
+		String temp1 = e.generateCode(codeGen);
+		String temp2 = e2.generateCode(codeGen);
+
+		// Crear un temporal para almacenar el resultado de la condición
+		String tempResult = codeGen.newTemp();
+
+		// Obtener el operador de la condición
+		String operator = c.toString(); // Se asume que existe un método getOperator en Condition
+
+		// Agregar la instrucción para evaluar la condición
+		codeGen.addInstruction(operator, temp1, temp2, tempResult);
+
+		// Retornar el temporal que contiene el resultado de la condición
+		return tempResult;
+	}
+
 }
 
 class PBooleanExpression implements Expr
@@ -785,6 +1009,11 @@ class PBooleanExpression implements Expr
 	{
 		return expr.run(hm);
 	}
+
+	public String generateCode(c3Direcciones codeGen) {
+		// Delegar la generación de código a la expresión envuelta
+		return expr.generateCode(codeGen);
+	}
 }
 
 class NegationBooleanExpression implements Expr
@@ -799,6 +1028,21 @@ class NegationBooleanExpression implements Expr
 	public Object run(HashMap<String, Object> hm)
 	{
 		return !((Boolean)expr.run(hm));
+	}
+
+	@Override
+	public String generateCode(c3Direcciones codeGen) {
+		// Generar el código para la expresión contenida
+		String tempExpr = expr.generateCode(codeGen);
+
+		// Crear un nuevo temporal para almacenar el resultado de la negación
+		String tempResult = codeGen.newTemp();
+
+		// Añadir la instrucción de negación lógica
+		codeGen.addInstruction("NOT", tempExpr, null, tempResult);
+
+		// Retornar el temporal que contiene el resultado
+		return tempResult;
 	}
 }
 
@@ -816,6 +1060,22 @@ class AndBooleanExpression implements Expr
 	{
 		return (Boolean)expr.run(hm) && (Boolean)expr2.run(hm) ;
 	}
+
+	@Override
+	public String generateCode(c3Direcciones codeGen) {
+		// Generar código para las expresiones individuales
+		String tempExpr1 = expr.generateCode(codeGen);
+		String tempExpr2 = expr2.generateCode(codeGen);
+
+		// Crear un nuevo temporal para almacenar el resultado del AND
+		String tempResult = codeGen.newTemp();
+
+		// Añadir la instrucción AND al generador de código
+		codeGen.addInstruction("AND", tempExpr1, tempExpr2, tempResult);
+
+		// Retornar el temporal que contiene el resultado
+		return tempResult;
+	}
 }
 
 class OrBooleanExpression implements Expr
@@ -831,6 +1091,22 @@ class OrBooleanExpression implements Expr
 	public Object run(HashMap<String, Object> hm)
 	{
 		return (Boolean)expr.run(hm) || (Boolean)expr2.run(hm);
+	}
+
+	@Override
+	public String generateCode(c3Direcciones codeGen) {
+		// Generar código para las expresiones individuales
+		String tempExpr1 = expr.generateCode(codeGen);
+		String tempExpr2 = expr2.generateCode(codeGen);
+
+		// Crear un nuevo temporal para almacenar el resultado del OR
+		String tempResult = codeGen.newTemp();
+
+		// Añadir la instrucción OR al generador de código
+		codeGen.addInstruction("OR", tempExpr1, tempExpr2, tempResult);
+
+		// Retornar el temporal que contiene el resultado
+		return tempResult;
 	}
 }
 
@@ -849,6 +1125,19 @@ class StringExpression implements Expr
 	{
 		return value;
 	}
+
+	@Override
+	public String generateCode(c3Direcciones codeGen) {
+		// Crear un nuevo temporal para almacenar el valor de la cadena
+		String tempResult = codeGen.newTemp();
+
+		// Instrucción para asignar la cadena al temporal
+		// Dado que addInstruction solo acepta 4 parámetros, se usa el temporal para almacenar la cadena directamente
+		codeGen.addInstruction("ASSIGN", "\"" + value + "\"", "", tempResult);
+
+		// Retornar el temporal que contiene el valor de la cadena
+		return tempResult;
+	}
 }
 
 class StrEnterExpression implements Expr
@@ -858,6 +1147,19 @@ class StrEnterExpression implements Expr
 		java.util.Scanner in = new java.util.Scanner(System.in);
 		String s = in.nextLine();
 		return s;
+	}
+
+	@Override
+	public String generateCode(c3Direcciones codeGen) {
+		// Generar un nuevo temporal para almacenar la entrada del usuario
+		String tempResult = codeGen.newTemp();
+
+		// Generar el código para la instrucción que asigna la entrada de texto al temporal
+		// En este caso, el valor de la entrada no puede ser directamente pasado, así que se coloca un marcador.
+		codeGen.addInstruction("READ", "STRING", "", tempResult);
+
+		// Retornar el temporal donde se almacenará el valor de la cadena ingresada
+		return tempResult;
 	}
 }
 
@@ -883,6 +1185,22 @@ class ConcatStringExpression implements Expr
 			System.exit(1);
 			return null;
 		}
+	}
+
+	@Override
+	public String generateCode(c3Direcciones codeGen) {
+		// Generar los códigos para las subexpresiones s y s2
+		String temp1 = s.generateCode(codeGen);
+		String temp2 = s2.generateCode(codeGen);
+
+		// Generar un nuevo temporal para almacenar el resultado de la concatenación
+		String tempResult = codeGen.newTemp();
+
+		// Instrucción para concatenar las cadenas
+		codeGen.addInstruction("CONCAT", temp1, temp2, tempResult);
+
+		// Retornar el temporal donde se almacena el resultado de la concatenación
+		return tempResult;
 	}
 }
 
@@ -923,6 +1241,24 @@ class SubStringExpression implements Expr
 			return null;
 		}
 
+	}
+
+	@Override
+	public String generateCode(c3Direcciones codeGen) {
+		// Generar código para las subexpresiones
+		String temp1 = sExpr.generateCode(codeGen);  // Obtiene el temporal para la cadena
+		String temp2 = posExpr.generateCode(codeGen); // Obtiene el temporal para la posición
+		String temp3 = lengthExpr.generateCode(codeGen); // Obtiene el temporal para la longitud
+
+		// Generar un nuevo temporal para el resultado
+		String tempResult = codeGen.newTemp();
+
+		// Generar código intermedio para obtener la subcadena
+		// Este es un ejemplo de cómo puede ser la instrucción
+		codeGen.addInstruction("SUBSTRING", temp1, temp2 + ", " + temp3, tempResult);
+
+		// Retornar el nombre del temporal que contiene el resultado de la subcadena
+		return tempResult;
 	}
 }
 
